@@ -123,18 +123,24 @@ with st.sidebar:
             st.sidebar.warning("尚未偵測到 API Key！")
 
 
-# 強制鎖定使用 gemini-3.8-flash 模型
+# 具備自動重試防塞車機制的呼叫函式
 def call_essence_gemini(api_key, prompt):
     client = genai.Client(api_key=api_key)
-    try:
-        res = client.models.generate_content(
-            model='gemini-3.8-flash',
-            contents=prompt
-        )
-        if res and res.text:
-            return res.text
-    except Exception as e:
-        raise Exception(f"呼叫 gemini-3.8-flash 發生錯誤：{e}")
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            res = client.models.generate_content(
+                model='gemini-3.8-flash',
+                contents=prompt
+            )
+            if res and res.text:
+                return res.text
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(2) # 遇到 503 暫停 2 秒後自動重試
+                continue
+            else:
+                raise Exception(f"伺服器目前較為繁忙（503），請稍候幾秒再點擊按鈕重試。詳細錯誤：{e}")
 
 
 # ==================== 區塊一：單人精準人格分析與獨立分類設定 ====================
@@ -231,7 +237,7 @@ if st.button("開始生成本質才華解構與中英雙語 SOP 報告", key="bt
         """
         
         try:
-            with st.spinner("正在透過 gemini-3.8-flash 引擎進行靈魂本質深度分析與雙語報告生成中（請稍候）..."):
+            with st.spinner("正在透過 gemini-3.8-flash 引擎進行靈魂本質深度分析與雙語報告生成中（若遇伺服器忙碌將自動重試）..."):
                 report_content = call_essence_gemini(api_key, prompt)
                 
             st.success("本質才華解構與中英雙語分析報告已產出！")
@@ -318,7 +324,7 @@ if st.button("開始生成中英雙語團隊本質矩陣與協作 SOP 藍圖報�
         """
         
         try:
-            with st.spinner("正在透過 gemini-3.8-flash 引擎梳理團隊本質矩陣與中英雙語 SOP 藍圖中..."):
+            with st.spinner("正在透過 gemini-3.8-flash 引擎梳理團隊本質矩陣與中英雙語 SOP 藍圖中（若遇伺服器忙碌將自動重試）..."):
                 team_report_content = call_essence_gemini(api_key, team_prompt)
                 
             st.success("中英雙語團隊本質矩陣與 SOP 分析報告已產出！")
