@@ -174,3 +174,4 @@ if generate_btn:
 
 else:
     st.info(t["init_tip"])
+
