@@ -85,7 +85,7 @@ st.markdown("""
                 TBM-HR 智慧決策與人格分析平台 (本質與才華深度雙語版)
             </h1>
             <p style="font-size: 0.9rem; color: #388E3C !important; margin: 0;">
-                結合東方八字命盤與西方生命靈數雙軌基準，深度解構個人本質與天賦原型，不使用冰冷數字，提供具體清晰的中英雙語分析報告。
+                結合東方八字命盤與西方生命靈數雙軌基準，深度解構個人本質與天賦原型，提供清晰的中英雙語分析報告。
             </p>
         </div>
     </div>
@@ -123,10 +123,11 @@ with st.sidebar:
             st.sidebar.warning("尚未偵測到 API Key！")
 
 
-# 具備自動容錯與多模型備援的呼叫函式
+# 具備自動容錯與最新模型（gemini-3.8-flash）的呼叫函式
 def call_essence_gemini(api_key, prompt):
     client = genai.Client(api_key=api_key)
-    models_to_try = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash']
+    # 優先使用最新穩定版 gemini-3.8-flash，並保留備援
+    models_to_try = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
     
     last_err = None
     for m in models_to_try:
@@ -210,7 +211,6 @@ if st.button("開始生成本質才華解構與中英雙語 SOP 報告", key="bt
     if not api_key:
         st.error("請先提供 Gemini API Key 才能執行 AI 分析！")
     else:
-        # 移除抽象的百分比數字，改用綠意心靈與職能導向的狀態提示
         st.markdown("#### ☘️ 個人天賦原型與本質特質定調 (Talent Archetype & Essence Overview)")
         st.info("💡 系統已略過抽象數字分數，直接進入深度本質、天賦才華與崗位 SOP 的中英雙語文字解析。")
 
@@ -225,7 +225,7 @@ if st.button("開始生成本質才華解構與中英雙語 SOP 報告", key="bt
         - 主管生日 / Manager DOB：{manager_birthday}
         - 組織領導層級 / Manager Level：{manager_level}
         
-        【特別注意】：**絕對不要出現任何冰冷的百分比或分數（如 92.5% 或 88 分）**。請完全改以具體的「天賦原型（Talent Archetype）」與文字描述來呈現。
+        【特別注意】：**絕對不要出現任何冰冷的百分比或分數**。請完全改以具體的「天賦原型（Talent Archetype）」與文字描述來呈現。
         
         【格式要求】：報告中的每一個章節標題與內文解說，皆須包含清晰的【中文】與對應的專業【英文翻譯說明】，確保雙語團隊皆能完全理解。
         
@@ -240,7 +240,7 @@ if st.button("開始生成本質才華解構與中英雙語 SOP 報告", key="bt
         """
         
         try:
-            with st.spinner("正在為您進行靈魂本質與核心才華的深度 AI 運算與雙語報告生成中（請稍候）..."):
+            with st.spinner("正在透過最新 gemini-3.8-flash 引擎進行靈魂本質深度分析與雙語報告生成中（請稍候）..."):
                 report_content = call_essence_gemini(api_key, prompt)
                 
             st.success("本質才華解構與中英雙語分析報告已產出！")
@@ -327,7 +327,7 @@ if st.button("開始生成中英雙語團隊本質矩陣與協作 SOP 藍圖報�
         """
         
         try:
-            with st.spinner("正在透過 AI 深度引擎梳理團隊本質矩陣與中英雙語 SOP 藍圖中..."):
+            with st.spinner("正在透過最新 gemini-3.8-flash 引擎梳理團隊本質矩陣與中英雙語 SOP 藍圖中..."):
                 team_report_content = call_essence_gemini(api_key, team_prompt)
                 
             st.success("中英雙語團隊本質矩陣與 SOP 分析報告已產出！")
