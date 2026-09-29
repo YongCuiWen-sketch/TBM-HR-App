@@ -74,7 +74,7 @@ st.markdown("""
     <div style="display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="background-color: #FFFFFF; color: #2E7D32 !important; padding: 0.4rem 0.9rem; border-radius: 0.5rem; font-weight: 700; border: 1px solid #C8E6C9; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                🌱 TBM 綠野心靈與天賦空間 (Essence & Talents Engine)
+                🌱 TBM 綠野心靈與天賦空間 (Gemini 3.8 Flash Engine)
             </div>
             <span style="background-color: #E8F5E9; color: #2E7D32 !important; padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 600; border: 1px solid #C8E6C9;">
                 Bringing Everything Together ! 🌿
@@ -85,7 +85,7 @@ st.markdown("""
                 TBM-HR 智慧決策與人格分析平台 (本質與才華深度雙語版)
             </h1>
             <p style="font-size: 0.9rem; color: #388E3C !important; margin: 0;">
-                結合東方八字命盤與西方生命靈數雙軌基準，深度解構個人本質與天賦原型，提供清晰的中英雙語分析報告。
+                結合東方八字命盤與西方生命靈數雙軌基準，透過 gemini-3.8-flash 深度解構個人本質與天賦原型，提供中英雙語分析報告。
             </p>
         </div>
     </div>
@@ -123,27 +123,18 @@ with st.sidebar:
             st.sidebar.warning("尚未偵測到 API Key！")
 
 
-# 具備自動容錯與最新模型（gemini-3.8-flash）的呼叫函式
+# 強制鎖定使用 gemini-3.8-flash 模型
 def call_essence_gemini(api_key, prompt):
     client = genai.Client(api_key=api_key)
-    # 優先使用最新穩定版 gemini-3.8-flash，並保留備援
-    models_to_try = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
-    
-    last_err = None
-    for m in models_to_try:
-        for _ in range(2):
-            try:
-                res = client.models.generate_content(
-                    model=m,
-                    contents=prompt
-                )
-                if res and res.text:
-                    return res.text
-            except Exception as e:
-                last_err = e
-                time.sleep(1)
-                continue
-    raise Exception(f"無法取得 AI 回應。詳細錯誤：{last_err}")
+    try:
+        res = client.models.generate_content(
+            model='gemini-3.8-flash',
+            contents=prompt
+        )
+        if res and res.text:
+            return res.text
+    except Exception as e:
+        raise Exception(f"呼叫 gemini-3.8-flash 發生錯誤：{e}")
 
 
 # ==================== 區塊一：單人精準人格分析與獨立分類設定 ====================
@@ -212,7 +203,7 @@ if st.button("開始生成本質才華解構與中英雙語 SOP 報告", key="bt
         st.error("請先提供 Gemini API Key 才能執行 AI 分析！")
     else:
         st.markdown("#### ☘️ 個人天賦原型與本質特質定調 (Talent Archetype & Essence Overview)")
-        st.info("💡 系統已略過抽象數字分數，直接進入深度本質、天賦才華與崗位 SOP 的中英雙語文字解析。")
+        st.info("💡 系統已略過抽象數字分數，直接透過 gemini-3.8-flash 進入深度本質、天賦才華與崗位 SOP 的中英雙語文字解析。")
 
         prompt = f"""
         請擔任 TBM-HR (Tan Boon Ming) 資深首席 HR 顧問與自然生態心靈導師。
@@ -240,7 +231,7 @@ if st.button("開始生成本質才華解構與中英雙語 SOP 報告", key="bt
         """
         
         try:
-            with st.spinner("正在透過最新 gemini-3.8-flash 引擎進行靈魂本質深度分析與雙語報告生成中（請稍候）..."):
+            with st.spinner("正在透過 gemini-3.8-flash 引擎進行靈魂本質深度分析與雙語報告生成中（請稍候）..."):
                 report_content = call_essence_gemini(api_key, prompt)
                 
             st.success("本質才華解構與中英雙語分析報告已產出！")
@@ -327,7 +318,7 @@ if st.button("開始生成中英雙語團隊本質矩陣與協作 SOP 藍圖報�
         """
         
         try:
-            with st.spinner("正在透過最新 gemini-3.8-flash 引擎梳理團隊本質矩陣與中英雙語 SOP 藍圖中..."):
+            with st.spinner("正在透過 gemini-3.8-flash 引擎梳理團隊本質矩陣與中英雙語 SOP 藍圖中..."):
                 team_report_content = call_essence_gemini(api_key, team_prompt)
                 
             st.success("中英雙語團隊本質矩陣與 SOP 分析報告已產出！")
