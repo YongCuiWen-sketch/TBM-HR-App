@@ -1,4 +1,4 @@
-streamlit
+google-genai
+plotly
 pandas
 numpy
-plotly
