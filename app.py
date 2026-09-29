@@ -21,12 +21,35 @@ analysis_mode = st.sidebar.radio(
     ["👤 單人精準評估模式", "👥 群體 / 團隊矩陣分析模式（支援 Excel 上傳）"]
 )
 
+# 部門選項（已加入 IT 資訊科技部）
 department = st.sidebar.selectbox(
     "選擇評估部門",
-    ["財務與會計部 (Finance & Accounting)", "研發部 (R&D)", "市場行銷部 (Marketing)", "人力資源部 (HR)"]
+    [
+        "財務與會計部 (Finance & Accounting)", 
+        "研發部 (R&D)", 
+        "市場行銷部 (Marketing)", 
+        "銷售與業務部 (Sales & Business Development)",
+        "資訊科技部 / IT Department (Information Technology)",
+        "人力資源部 (HR)"
+    ]
 )
-target_position = st.sidebar.text_input("目標崗位 / 職位", "資深會計 (Senior Accountant)")
-manager_birthday = st.sidebar.date_input("主管生日（用於團隊矩陣對應）")
+
+# 主管/領導層級選項（包含 CEO、TA 與 IT 部門相關）
+manager_level = st.sidebar.selectbox(
+    "主管 / 領導層級",
+    [
+        "CEO (最高執行長)",
+        "TA (直屬主管 / Team Leader)",
+        "高層 (Executive / C-Level)",
+        "經理 (Manager)",
+        "IT 資訊科技主管 (IT Manager / Head of IT)",
+        "資深 / 專業人員 (Senior / Specialist)",
+        "基層 / 新人 (Junior / Entry-Level)"
+    ]
+)
+
+target_position = st.sidebar.text_input("目標崗位 / 職位", "資深軟體工程師 / IT 專員 (Senior IT Specialist)")
+manager_birthday = st.sidebar.date_input("主管 / 領導者生日（用於團隊矩陣對應）")
 
 # 側邊欄：API Key 安全授權
 api_key = ""
@@ -59,16 +82,17 @@ if analysis_mode == "👤 單人精準評估模式":
                 prompt = f"""
                 請擔任專業的企業 HR 顧問與團隊矩陣分析師，針對以下個別員工進行深度分析與評估：
                 - 評估部門：{department}
+                - 領導/主管層級：{manager_level}
                 - 目標崗位：{target_position}
-                - 主管生日：{manager_birthday}
+                - 主管/領導者生日：{manager_birthday}
                 - 受評估員工：{user_name}（出生日期：{birth_date}）
                 
-                請產出詳細的個人潛能評估、與主管的團隊適應性、優勢劣勢以及職涯發展建議報告。
+                請產出詳細的個人潛能評估、與該層級領導者（如 CEO 或 TA）的互動適應性、是否適合該部門或建議調往其他部門、面試時該問的關鍵問題、建議員工在面試中展現的優勢，以及職涯發展建議報告。
                 """
                 
                 with st.spinner("AI 顧問正在進行個人深度運算中，請稍候..."):
                     response = client.models.generate_content(
-                        model='gemini-3.8-flash',
+                        model='gemini-1.5-flash',
                         contents=prompt
                     )
                     
@@ -76,7 +100,7 @@ if analysis_mode == "👤 單人精準評估模式":
                 st.markdown(response.text)
                 
             except Exception as e:
-                st.error(f"❌ 呼叫 AI 時發生錯誤（可能是伺服器暫時繁忙，請稍後再試一次）：{e}")
+                st.error(f"❌ 呼叫 AI 時發生錯誤：{e}")
 
 else:
     st.subheader("👥 群體 / 團隊矩陣綜合分析（Excel 檔案上傳）")
@@ -84,7 +108,6 @@ else:
     
     uploaded_file = st.file_uploader("上傳員工名單檔案", type=["csv", "xlsx"])
     
-    # 同時保留手動輸入作為備用或預覽
     with st.expander("或者直接手動貼上名單（選填）"):
         team_members_input = st.text_area(
             "團隊成員名單與生日（每行一位）",
@@ -97,7 +120,6 @@ else:
         else:
             team_data_str = ""
             
-            # 如果使用者有上傳檔案，優先讀取檔案內容
             if uploaded_file is not None:
                 try:
                     if uploaded_file.name.endswith('.csv'):
@@ -105,13 +127,11 @@ else:
                     else:
                         df = pd.read_excel(uploaded_file)
                     
-                    # 將 DataFrame 轉為文字字串讓 AI 閱讀
                     team_data_str = df.to_string(index=False)
                     st.success(f"✅ 成功讀取檔案：{uploaded_file.name}，共 {len(df)} 筆資料！")
                 except Exception as file_err:
-                    st.error(f"❌ 讀取檔案失敗，請確認格式是否正確：{file_err}")
+                    st.error(f"❌ 讀取檔案失敗：{file_err}")
             else:
-                # 若未上傳檔案，則使用手動輸入的內容
                 team_data_str = team_members_input
                 st.info("ℹ️ 未上傳檔案，將使用上方手動輸入的名單進行分析。")
             
@@ -121,17 +141,18 @@ else:
                     prompt = f"""
                     請擔任專業的企業 HR 顧問與團隊矩陣分析師，針對以下整個團隊進行群體矩陣與協作分析：
                     - 評估部門：{department}
+                    - 領導/主管層級：{manager_level}
                     - 目標崗位/團隊方向：{target_position}
-                    - 主管生日：{manager_birthday}
+                    - 主管/領導者生日：{manager_birthday}
                     - 團隊成員與生日清單：
                     {team_data_str}
                     
-                    請產出詳細的團隊成員互補性、群體靈數矩陣分佈、團隊優勢、潛在盲點以及主管如何領導這個群體的綜合建議報告。
+                    請產出詳細的團隊成員互補性、群體靈數矩陣分佈、團隊優勢、潛在盲點，以及該層級領導者（如 CEO 或 TA）如何領導與佈署這個團隊的綜合建議報告。
                     """
                     
-                    with st.spinner("AI 顧問正在進行團隊矩陣矩陣運算中，請稍候..."):
+                    with st.spinner("AI 顧問正在進行團隊矩陣運算中，請稍候..."):
                         response = client.models.generate_content(
-                            model='gemini-3.8-flash',
+                            model='gemini-1.5-flash',
                             contents=prompt
                         )
                         
@@ -139,4 +160,4 @@ else:
                     st.markdown(response.text)
                     
                 except Exception as e:
-                    st.error(f"❌ 呼叫 AI 時發生錯誤（可能是伺服器暫時繁忙，請稍後再試一次）：{e}")
+                    st.error(f"❌ 呼叫 AI 時發生錯誤：{e}")
