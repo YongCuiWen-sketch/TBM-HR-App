@@ -2,14 +2,14 @@ import streamlit as st
 import google.genai as genai
 import pandas as pd
 
-# 設定網頁標題與基本樣式（寬版佈局，乾淨背景）
+# 設定網頁標題為 TBM-HR 與基本樣式（寬版佈局，乾淨白底）
 st.set_page_config(
-    page_title="TBM 官方智慧人才與團隊矩陣系統",
+    page_title="TBM-HR 智慧人才與人格分析系統",
     page_icon="⭐",
     layout="wide"
 )
 
-# 載入自訂 CSS 樣式，精準復刻 TBM 官方網站的乾淨背景與紅藍標誌
+# 載入自訂 CSS 樣式，精準復刻 TBM 官方網站的純白背景與紅藍標誌
 st.markdown("""
     <style>
     .stApp {
@@ -52,19 +52,19 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 嵌入 TBM 官方 Logo 與導覽列 -----------------
+# ----------------- 穩定載入 TBM 官方 Logo 與導覽列 -----------------
 st.markdown("""
 <div class="tbm-nav-bar">
     <div style="display: flex; align-items: center; gap: 20px;">
-        <!-- 載入 TBM 官方網頁的 Logo 圖片 -->
-        <img src="https://shop.tbm.com.my/pub/static/version1713430635/frontend/Codilar/tbm/en_US/images/logo.svg" alt="TBM Logo" style="height: 45px;">
+        <!-- 使用穩定且保證可載入的 TBM 官方 Logo 圖片連結 -->
+        <img src="https://shop.tbm.com.my/pub/static/version1713430635/frontend/Codilar/tbm/en_US/images/logo.svg" alt="TBM Logo" style="height: 42px;" onerror="this.onerror=null; this.src='https://www.tbm.com.my/media/logo/default/tbm-logo.png';">
         <span style="font-size: 1.1rem; font-weight: 700; color: #1E3A8A; border-left: 2px solid #CBD5E1; padding-left: 15px;">
-            Bringing Everything Together ! &nbsp;|&nbsp; 官方智慧決策與人才管理平台
+            Bringing Everything Together ! &nbsp;|&nbsp; TBM-HR 智慧決策與人格分析平台
         </span>
     </div>
     <div>
         <span style="background-color: #FEF2F2; color: #C8102E; padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.85rem; font-weight: 600; border: 1px solid #FECACA;">
-            ⭐ TBM Enterprise AI
+            ⭐ TBM-HR Portal
         </span>
     </div>
 </div>
@@ -73,7 +73,7 @@ st.markdown("""
 # 側邊欄：環境與全域設定
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/manager.png", width=60)
-    st.header("⚙️ TBM 組織與模式設定")
+    st.header("⚙️ TBM-HR 組織與模式設定")
     
     department = st.selectbox(
         "🏢 選擇評估部門",
@@ -100,7 +100,7 @@ with st.sidebar:
         ]
     )
 
-    manager_birthday = st.sidebar.date_input("📅 主管 / 領導者生日（矩陣靈數對應）")
+    manager_birthday = st.sidebar.date_input("📅 主管 / 領導者生日（人格靈數對應）")
     
     st.markdown("---")
     
@@ -115,12 +115,12 @@ with st.sidebar:
             st.sidebar.warning("⚠️ 尚未偵測到 API Key！")
 
 # 使用現代化的分頁籤 (Tabs) 切換單人與群體模式
-tab1, tab2 = st.tabs(["👤 單人精準評估模式", "👥 群體 / 團隊矩陣分析模式（支援 Excel）"])
+tab1, tab2 = st.tabs(["👤 單人精準人格分析模式", "👥 群體 / 團隊矩陣人格分析模式（支援 Excel）"])
 
-# ==================== 模式一：單人精準評估 ====================
+# ==================== 模式一：單人精準人格分析 ====================
 with tab1:
-    st.markdown("### 💡 TBM 夥伴潛能、適配度與面試教練分析")
-    st.write("針對應徵 TBM 各大部門的候選人或現職員工進行深度解析。")
+    st.markdown("### 💡 TBM-HR 夥伴潛能、人格特質與適配度深度解析")
+    st.write("針對應徵 TBM 各大部門的候選人或現職員工進行專業的人格行為風格分析。")
     
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -149,17 +149,17 @@ with tab1:
             
         st.markdown('</div>', unsafe_allow_html=True)
         
-    if st.button("🚀 開始執行 TBM 單人 AI 深度分析", key="btn_single"):
+    if st.button("🚀 開始執行 TBM-HR 單人 AI 人格深度分析", key="btn_single"):
         if not api_key:
             st.error("❌ 請先提供 Gemini API Key 才能執行 AI 分析！")
         else:
             try:
                 client = genai.Client(api_key=api_key)
                 prompt = f"""
-                請擔任 TBM (Tan Boon Ming) 馬來西亞知名家電與一站式服務企業的資深 HR 顧問與面試教練。
+                請擔任 TBM-HR (Tan Boon Ming) 馬來西亞知名家電與一站式服務企業的資深 HR 顧問與人格分析專家。
                 TBM 的企業使命是「Ensuring the right appliance for all」，願景是成為「One-stop solution center with best-in-class service」。
                 
-                請針對以下個別候選人/員工進行符合 TBM 企業文化的專業深度分析：
+                請針對以下個別候選人/員工進行符合 TBM 企業文化的人格行為風格與適配度深度分析：
                 - 評估部門：{department}
                 - 受評估員工職位：{candidate_position}
                 - 領導/主管層級：{manager_level}
@@ -167,21 +167,21 @@ with tab1:
                 - 受評估員工：{user_name}（出生日期：{birth_date}）
                 
                 請以清晰優美的結構化排版（包含標題與重點條列）產出：
-                1. 個人潛能特質與生命靈數解析（是否具備 TBM 重視的誠信、熱忱與服務精神）
-                2. 與該 TBM 職位的適配度評估（是否勝任、優勢與劣勢）
-                3. 部門適配建議（是否適合該零售/技術/後勤部門，或建議調往其他崗位）
+                1. 個人人格特質與生命靈數行為風格解析（是否具備 TBM 重視的誠信、熱忱與服務精神）
+                2. 與該 TBM 職位的適配度評估（人格優勢與潛在盲點）
+                3. 部門工作行為風格建議（是否適合該零售/技術/後勤部門）
                 4. 與該層級領導者（如 CEO 或 TA）的互動適應性與協作風格
-                5. TBM 面試時建議主考官詢問的關鍵高階問題
-                6. 長期在 TBM 體系下的職涯發展建議報告
+                5. TBM-HR 面試時建議主考官詢問的關鍵人格與情境問題
+                6. 長期在 TBM 體系下的人格成長與職涯發展建議報告
                 """
                 
-                with st.spinner("✨ TBM AI 顧問正在進行深度運算與報告生成中，請稍候..."):
+                with st.spinner("✨ TBM-HR 顧問正在進行人格與潛能深度運算中，請稍候..."):
                     response = client.models.generate_content(
                         model='gemini-1.5-flash',
                         contents=prompt
                     )
                     
-                st.success("🎉 TBM 個人深度分析報告已完成！")
+                st.success("🎉 TBM-HR 個人人格深度分析報告已完成！")
                 st.markdown('<div class="card">', unsafe_allow_html=True)
                 st.markdown(response.text)
                 st.markdown('</div>', unsafe_allow_html=True)
@@ -189,10 +189,10 @@ with tab1:
             except Exception as e:
                 st.error(f"❌ 呼叫 AI 時發生錯誤：{e}")
 
-# ==================== 模式二：群體矩陣分析 ====================
+# ==================== 模式二：群體人格矩陣分析 ====================
 with tab2:
-    st.markdown("### 👥 TBM 群體團隊矩陣與協作綜合分析")
-    st.write("透過上傳 Excel / CSV 檔案，一次性分析 TBM 團隊的人才結構、靈數矩陣分佈與團隊協作優勢。")
+    st.markdown("### 👥 TBM-HR 群體團隊人格矩陣與協作分析")
+    st.write("透過上傳 Excel / CSV 檔案，一次性分析 TBM 團隊的人格結構分佈與團隊協作默契。")
     
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -205,7 +205,7 @@ with tab2:
             )
         st.markdown('</div>', unsafe_allow_html=True)
         
-    if st.button("🚀 開始執行 TBM 群體團隊矩陣分析", key="btn_team"):
+    if st.button("🚀 開始執行 TBM-HR 群體團隊人格矩陣分析", key="btn_team"):
         if not api_key:
             st.error("❌ 請先提供 Gemini API Key 才能執行 AI 分析！")
         else:
@@ -230,10 +230,10 @@ with tab2:
                 try:
                     client = genai.Client(api_key=api_key)
                     prompt = f"""
-                    請擔任 TBM (Tan Boon Ming) 馬來西亞頂尖家電與一站式服務企業的資深 HR 顧問與團隊矩陣分析師。
+                    請擔任 TBM-HR (Tan Boon Ming) 馬來西亞頂尖家電與一站式服務企業的資深 HR 顧問與團隊人格矩陣分析師。
                     TBM 致力於提供最佳的客戶服務與一站式解決方案（One-stop solution center）。
                     
-                    請針對以下整個團隊進行專業的群體矩陣與協作綜合分析：
+                    請針對以下整個團隊進行專業的群體人格矩陣與協作綜合分析：
                     - 評估部門：{department}
                     - 領導/主管層級：{manager_level}
                     - 目標崗位/團隊方向：TBM 零售與售後服務卓越戰力配置
@@ -242,19 +242,19 @@ with tab2:
                     {team_data_str}
                     
                     請以清晰優美的結構化排版（包含標題與重點條列）產出：
-                    1. TBM 團隊成員整體潛能分佈與靈數矩陣概況
-                    2. 成員間的性格互補性與協作默契分析
-                    3. 團隊整體核心優勢與潛在盲點/風險
-                    4. 針對該層級領導者（如 CEO 或 TA）如何領導、激勵與佈署這個 TBM 團隊的具體戰略建議
+                    1. TBM 團隊成員整體人格特質分佈與靈數矩陣概況
+                    2. 成員間的人格互補性與協作默契分析
+                    3. 團隊整體行為優勢與潛在盲點/風險
+                    4. 針對該層級領導者（如 CEO 或 TA）如何依據團隊人格特質進行領導、激勵與佈署的具體戰略建議
                     """
                     
-                    with st.spinner("✨ TBM AI 顧問正在進行團隊矩陣與協作大數據運算中，請稍候..."):
+                    with st.spinner("✨ TBM-HR 顧問正在進行團隊人格矩陣大數據運算中，請稍候..."):
                         response = client.models.generate_content(
                             model='gemini-1.5-flash',
                             contents=prompt
                         )
                         
-                    st.success("🎉 TBM 群體團隊分析報告已完成！")
+                    st.success("🎉 TBM-HR 群體團隊人格分析報告已完成！")
                     st.markdown('<div class="card">', unsafe_allow_html=True)
                     st.markdown(response.text)
                     st.markdown('</div>', unsafe_allow_html=True)
