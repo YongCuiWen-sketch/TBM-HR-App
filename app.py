@@ -222,7 +222,7 @@ if st.button("開始執行單人雙軌天賦與崗位 SOP 深度解析", key="bt
             
             with st.spinner("正在為您結合雙軌天賦與崗位專屬 SOP 運算中..."):
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-3.8-flash',
                     contents=prompt
                 )
                 
@@ -302,7 +302,7 @@ if st.button("開始執行群體矩陣、跨部門協作與 SOP 藍圖洞察", k
             
             請以優雅結構化排版產出：
             1. **團隊整體雙軌天賦與綠意人格能量分佈**：分析跨部門成員的天賦組合。
-            2. **跨部門與多層級協作藍圖**：從 CEO 到 Junior、各部門（創新開創、物流、行銷、IT等）之間的職責互補性與協作默契。
+            2. **跨部門與多層級協作藍圖**：從 CEO 到 Junior、各部門（創新開創、物流, 行銷、IT等）之間的職責互補性與協作默契。
             3. **跨部門作業標準與交接 SOP 建議**：針對不同部門間的協作斷點，提出標準化作業程序（SOP）與溝通對接優化方案。
             4. **團隊潛在盲點與溫和化解指南**：團隊運作風險與主管應對策略。
             5. **領導者激勵與戰略佈署指南**：針對該領導層級的團隊凝聚力打造方案。
@@ -310,7 +310,7 @@ if st.button("開始執行群體矩陣、跨部門協作與 SOP 藍圖洞察", k
             
             with st.spinner("正在為您梳理跨部門團隊矩陣、各部門 SOP 與協作藍圖中..."):
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-3.8-flash',
                     contents=prompt
                 )
                 
