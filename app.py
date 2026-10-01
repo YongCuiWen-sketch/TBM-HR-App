@@ -72,12 +72,12 @@ st.markdown("""
         🔯 TBM-HR Dual-Track Intelligence Dashboard
     </h1>
     <h3 style="font-size: 1.0rem; color: #94a3b8; font-weight: normal; margin: 0;">
-        【旗艦級雙向生日與首頁職業聯動 ｜ 五大類深度報告與專屬語音配音】
+        【完整旗艦級雙向生日與首頁職業聯動 ｜ 五大類深度報告與專屬語音配音】
     </h3>
 </div>
 """, unsafe_allow_html=True)
 
-# 完整保留您原本所有的 9 大核心部門清單
+# 完全恢復您原本最完整的 9 大核心部門清單
 all_departments = [
     "創新事業與新領域開創部 (New Business Ventures & Innovation)",
     "市場行銷與品牌發展部 (Marketing & Brand Development)",
@@ -90,23 +90,86 @@ all_departments = [
     "人力資源與人才發展部 (HR & People Development)"
 ]
 
-# 各部門對應的專業職稱選項庫
+# 完全恢復您原本最完整、包含 Junior 與各級細分的職稱選項庫
 department_roles = {
-    "創新事業與新領域開創部 (New Business Ventures & Innovation)": ["創新總監 (Innovation Director)", "新業務操盤手 (New Business Lead)", "MVP 專案經理", "策略孵化主管"],
-    "市場行銷與品牌發展部 (Marketing & Brand Development)": ["Marketing 總監 / 操盤手", "品牌行銷總監 (Brand Director)", "流量增長負責人", "公關與公眾關係總監"],
-    "物流與供應鏈管理部 (Logistics & Supply Chain)": ["供應鏈總監 (Supply Chain Director)", "物流營運負責人", "採購與庫存管理總監", "倉儲自動化專案主管"],
-    "零售與門市營運部 (Retail & Store Operations)": ["零售營運總監 (Retail Operations Director)", "區域總經理 (Regional GM)", "門市拓展負責人", "零售培訓主管"],
-    "客戶服務與售後中心 (Customer Service & Support Centre)": ["客服總監 (CS Director)", "客戶體驗負責人 (CX Lead)", "售後運營主管", "質量監控經理"],
-    "銷售與業務發展部 (Sales & Business Development)": ["業務總監 (Sales Director)", "商務拓展總監 (BD Director)", "大客戶銷售負責人", "渠道營銷主管"],
-    "資訊科技與數位轉型部 (IT & Digital Transformation)": ["技術總監 / CTO", "數位轉型負責人", "產品研發總監", "數據分析主管"],
-    "財務與會計部 (Finance & Accounting)": ["財務總監 / CFO", "會計主管", "財務分析與預算經理", "資金管理主管"],
-    "人力資源與人才發展部 (HR & People Development)": ["人資總監 / CHRO", "人才發展負責人", "組織效能經理", "招聘與薪酬主管"]
+    "創新事業與新領域開創部 (New Business Ventures & Innovation)": [
+        "創新總監 (Innovation Director)", 
+        "新業務操盤手 (New Business Lead)", 
+        "MVP 專案經理 (MVP Project Manager)", 
+        "策略孵化主管 (Strategy Incubation Head)",
+        "Junior 創新專員 (Junior Innovation Specialist)",
+        "創新研發助理 (Innovation Research Assistant)"
+    ],
+    "市場行銷與品牌發展部 (Marketing & Brand Development)": [
+        "Marketing 總監 / 操盤手 (Marketing Director)", 
+        "品牌行銷總監 (Brand Director)", 
+        "流量增長負責人 (Growth Lead)", 
+        "公關與公眾關係總監 (PR Director)",
+        "Junior 行銷專員 (Junior Marketing Specialist)",
+        "社群運營主管 (Community Operations Lead)"
+    ],
+    "物流與供應鏈管理部 (Logistics & Supply Chain)": [
+        "供應鏈總監 (Supply Chain Director)", 
+        "物流營運負責人 (Logistics Operations Lead)", 
+        "採購與庫存管理總監 (Procurement & Inventory Director)", 
+        "倉儲自動化專案主管 (Warehouse Automation Lead)",
+        "Junior 物流專員 (Junior Logistics Specialist)",
+        "供應鏈分析師 (Supply Chain Analyst)"
+    ],
+    "零售與門市營運部 (Retail & Store Operations)": [
+        "零售營運總監 (Retail Operations Director)", 
+        "區域總經理 (Regional General Manager)", 
+        "門市拓展負責人 (Store Expansion Lead)", 
+        "零售培訓主管 (Retail Training Head)",
+        "Junior 門市主管 (Junior Store Supervisor)",
+        "資深店長 (Senior Store Manager)"
+    ],
+    "客戶服務與售後中心 (Customer Service & Support Centre)": [
+        "客服總監 (CS Director)", 
+        "客戶體驗負責人 (CX Lead)", 
+        "售後運營主管 (After-Sales Operations Head)", 
+        "質量監控經理 (Quality Assurance Manager)",
+        "Junior 客服專員 (Junior Customer Support Specialist)",
+        "VIP 客戶關係主管 (VIP Relationship Head)"
+    ],
+    "銷售與業務發展部 (Sales & Business Development)": [
+        "業務總監 (Sales Director)", 
+        "商務拓展總監 (BD Director)", 
+        "大客戶銷售負責人 (Key Account Lead)", 
+        "渠道營銷主管 (Channel Marketing Lead)",
+        "Junior 業務專員 (Junior Sales Representative)",
+        "資深商務經理 (Senior BD Manager)"
+    ],
+    "資訊科技與數位轉型部 (IT & Digital Transformation)": [
+        "技術總監 / CTO (Chief Technology Officer)", 
+        "數位轉型負責人 (Digital Transformation Lead)", 
+        "產品研發總監 (Product Development Director)", 
+        "數據分析主管 (Data Analytics Head)",
+        "Junior 軟體工程師 (Junior Software Engineer)",
+        "IT 支援工程師 (IT Support Engineer)"
+    ],
+    "財務與會計部 (Finance & Accounting)": [
+        "財務總監 / CFO (Chief Financial Officer)", 
+        "會計主管 (Accounting Head)", 
+        "財務分析與預算經理 (Financial Analyst & Budget Manager)", 
+        "資金管理主管 (Treasury Management Head)",
+        "Junior 會計專員 (Junior Accounting Specialist)",
+        "審計專員 (Auditing Specialist)"
+    ],
+    "人力資源與人才發展部 (HR & People Development)": [
+        "人資總監 / CHRO (Chief Human Resources Officer)", 
+        "人才發展負責人 (Talent Development Lead)", 
+        "組織效能經理 (Organizational Effectiveness Manager)", 
+        "招聘與薪酬主管 (Recruitment & Compensation Head)",
+        "Junior HR 專員 (Junior HR Specialist)",
+        "培訓專員 (Training Specialist)"
+    ]
 }
 
 # 初始化本地智慧資料庫 (Session State)
 if "live_local_db" not in st.session_state:
     st.session_state.live_local_db = pd.DataFrame([
-        {"項目分類": "部門職能", "名稱": "全系統部門模組", "詳細內容": "9大部門與對應職稱連動正常。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")}
+        {"項目分類": "部門職能", "名稱": "全系統部門模組", "詳細內容": "9大部門與完整 Junior 及各級職稱連動正常。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")}
     ])
 
 # 側邊欄導航與 API 設定
@@ -127,7 +190,7 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.info("🔄 **系統提示**：\n報告內容與語音配音會完全對應您在首頁所選擇的部門與特定職稱！")
+    st.info("🔄 **系統提示**：\n報告內容與語音配音會完全對應您在首頁所選擇的部門與特定職稱（含 Junior 及各級職級）！")
     
     if app_mode == "🌟 模式一：旗艦級雙向生日與首頁職業聯動報告":
         st.header("🔮 直屬主管/老闆基準設定")
@@ -155,7 +218,7 @@ def get_bazi_element(birth_date):
     ]
     return elements[year % 5]
 
-# 生成報告函數（修復變數帶入與防錯）
+# 生成報告函數（徹底修正變數與引數，杜絕 NameError）
 def generate_birthday_driven_master_report(name, birth_date, dept, role, level, m_name, m_dept, m_lvl, m_bday, api_key):
     lp = calculate_life_path(birth_date)
     bazi_name, bazi_desc = get_bazi_element(birth_date)
@@ -182,9 +245,9 @@ def generate_birthday_driven_master_report(name, birth_date, dept, role, level, 
     b_str = birth_date.strftime('%Y-%m-%d')
     mb_str = m_bday.strftime('%Y-%m-%d')
     
-    speech_summary = f"這是一份為您量身打造的旗艦級五大類戰略總結報告。受評估員工 {name} 在 {dept} 擔任 {role}，生日為 {b_str}，生命靈數為 {lp}，五行屬 {bazi_name}。透過與直屬主管 {m_name}（生日 {mb_str}）的生日能量碰撞，本報告從核心命理、崗位適配、帶兵戰術、協同法則及未來高階崗位推薦等五大維度進行了深度解析。"
+    speech_summary = f"這是一份為您量身打造的旗艦級五大類戰略總結報告。受評估員工 {name} 在 {dept} 擔任 {role}，職級為 {level}，生日為 {b_str}，生命靈數為 {lp}，五行屬 {bazi_name}。透過與直屬主管 {m_name}（生日 {mb_str}）的生日能量碰撞，本報告從核心命理、崗位適配、帶兵戰術、協同法則及未來高階崗位推薦等五大維度進行了深度解析。"
     speech_p1 = f"第一部分，核心命理及性格特質畫象。主命數為 {lp}，五行屬 {bazi_name}。賦予其在 {role} 崗位上卓越的格局與破局能力。"
-    speech_p2 = f"第二部分，崗位適配性評估。深入剖析其擔任 {role} 的專業優勢、痛點洞察與指標把控能力。"
+    speech_p2 = f"第二部分，崗位適配性評估。深入剖析其以 {level} 職級擔任 {role} 的專業優勢、痛點洞察與指標把控能力。"
     speech_p3 = f"第三部分，多品類帶團隊與攻堅戰術。闡述如何以結構化思維在 {dept} 推進核心業務與團隊賦能。"
     speech_p4 = f"第四部分，員工與主管的動態協同法則。結合雙方生日能量，落實給機制不給束縛、以邏輯對話的協同原則。"
     speech_p5 = f"第五部分，其他高適配管理崗位推薦。涵蓋部門內的高階核心發展與多維戰略方向。"
@@ -215,7 +278,7 @@ def generate_birthday_driven_master_report(name, birth_date, dept, role, level, 
         <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 15px 20px; border-radius: 10px; border: 1px solid #4338ca; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h4 style="margin: 0; color: #818cf8; font-size: 1.0rem;">🔊 五大類報告總結配音與語音控制台</h4>
-                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #c7d2fe;">當前分析職位：<strong>{role}</strong> ｜ 點擊右側按鈕可聆聽總結配音。</p>
+                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #c7d2fe;">當前分析職位：<strong>{role} ({level})</strong> ｜ 點擊右側按鈕可聆聽總結配音。</p>
             </div>
             <div>
                 <button onclick="speakText(`{speech_summary}`)" style="background: #4f46e5; color: #ffffff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin-right: 8px;">
@@ -285,12 +348,12 @@ def generate_birthday_driven_master_report(name, birth_date, dept, role, level, 
         <!-- 🔵 第二類：崗位適配性評估 -->
         <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #3b82f6; margin-bottom: 30px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="font-size: 1.25rem; font-weight: 700; color: #3b82f6;">二、 崗位適配性評估：是否適合擔任「{role}」？</div>
+                <div style="font-size: 1.25rem; font-weight: 700; color: #3b82f6;">二、 崗位適配性評估：以「{level}」職級擔任「{role}」是否適配？</div>
                 <button onclick="speakText(`{speech_p2}`)" style="background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
                     ▶ 朗讀第二類
                 </button>
             </div>
-            <p style="color: #e2e8f0; font-size: 1rem; font-weight: bold; margin-bottom: 12px;">👉 顧問綜合結論：基於生日基因與「{role}」崗位匹配，高度適配！</p>
+            <p style="color: #e2e8f0; font-size: 1rem; font-weight: bold; margin-bottom: 12px;">👉 顧問綜合結論：基於生日基因與「{role} ({level})」崗位匹配，高度適配！</p>
             <ul style="color: #94a3b8; padding-left: 20px; font-size: 0.95rem; line-height: 1.8;">
                 <li><strong>痛點精準切入</strong>：在「{role}」崗位上憑藉數據直覺一眼看穿營運低效環節。</li>
                 <li><strong>專業與變現並重</strong>：用嚴格結構化指標把關，確保商業價值最大化。</li>
@@ -354,14 +417,14 @@ if app_mode == "🌟 模式一：旗艦級雙向生日與首頁職業聯動報�
             user_name = st.text_input("員工姓名 / 代號", "核心高管")
             birth_date = st.date_input("員工真實生日日期 (DOB)", value=pd.to_datetime("1985-06-20"))
         with col2:
-            st.markdown("#### 🎯 首頁部門與職業聯動選單（完全保留不變）")
+            st.markdown("#### 🎯 首頁部門與職業聯動選單（完整恢復 Junior 與各級細分）")
             target_department = st.selectbox("選擇員工所屬部門", all_departments)
             available_roles = department_roles.get(target_department, ["高級經理", "資深總監"])
             job_role = st.selectbox("選擇職務名稱 (Job Role)", available_roles)
-            candidate_level = st.selectbox("管理職級 (Level)", ["Senior Director", "Department Manager", "Team Lead", "CEO / Founder"])
+            candidate_level = st.selectbox("管理職級 (Level)", ["Senior Director", "Department Manager", "Team Lead", "Junior Specialist", "CEO / Founder"])
 
     if st.button("🚀 生成基於【首頁指定職稱】與【雙向生日】之五大類深度報告"):
-        st.success(f"報告生成完畢！已成功鎖定部門「{target_department}」與職稱「{job_role}」。")
+        st.success(f"報告生成完畢！已成功鎖定部門「{target_department}」與職稱「{job_role} ({candidate_level})」。")
         report_output = generate_birthday_driven_master_report(
             user_name, birth_date, target_department, job_role, candidate_level,
             manager_name, manager_dept, manager_level, manager_birthday, BUILTIN_API_KEY
