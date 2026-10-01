@@ -72,7 +72,7 @@ st.markdown("""
         🔯 TBM-HR Dual-Track Intelligence Dashboard
     </h1>
     <h3 style="font-size: 1.0rem; color: #94a3b8; font-weight: normal; margin: 0;">
-        【Google Gemini AI 雲端分析 + 語音朗讀報告 + 常態更新本地智慧備援系統】
+        【Google Gemini AI 雲端分析 + 分段語音朗讀報告 + 常態更新本地智慧備援系統】
     </h3>
 </div>
 """, unsafe_allow_html=True)
@@ -144,7 +144,7 @@ def get_bazi_element(birth_date):
     ]
     return elements[year % 5]
 
-# 雙軌智慧報告生成函數（含語音朗讀控制項）
+# 雙軌智慧報告生成函數（含分段語音朗讀控制項）
 def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dept, m_lvl, m_bday, api_key):
     lp = calculate_life_path(birth_date)
     bazi_name, _ = get_bazi_element(birth_date)
@@ -166,31 +166,20 @@ def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dep
     except Exception as e:
         analysis_source = f"Live Local Knowledge Base Fallback (雲端異常自動降級備援 🔄)"
 
-    # 準備供語音朗讀的純文字內容
-    speech_text = f"TBM-HR人才評估報告。受評估員工為 {name}，目標崗位為 {dept} 的 {role}。經雙軌智慧驗證，該員工展現出卓越的認知深度與價值實現驅動力。與直屬主管 {m_dept} 的協作架構完美構成前線長矛與後方防護盾的黃金組合。建議落實創新邊界與小規模試驗。"
+    # 各分段的純文字摘要（精簡穩健，確保語音不中斷）
+    speech_summary = f"TBM-HR人才評估報告總結。受評估員工為 {name}，目標崗位為 {dept} 的 {role}。雙軌智慧驗證顯示其具備優秀的戰略洞察與價值實現驅動力。"
+    speech_p1 = f"第一部分，個人本質解構。候選人展現出強大的認知深度與獨立思考能力，能瞬間抓出核心系統邏輯，心理韌性極佳。"
+    speech_p2 = f"第二部分，跨部門流動與多元適配。除了深耕原部門外，其系統化思維亦具備轉調至策略規劃或品牌行銷的強大潛能。"
+    speech_p3 = f"第三部分，主管協作與頻率對齊。直屬主管與員工在推進速度與治理結構上完美互補，建議落實創新邊界與小規模試驗。"
 
     report_html = f"""
     <div style="color: #e2e8f0; line-height: 1.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 15px;">
         
-        <!-- 🔊 內嵌語音朗讀控制面板 -->
-        <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 15px 20px; border-radius: 10px; border: 1px solid #4338ca; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h4 style="margin: 0; color: #818cf8; font-size: 1rem;">🔊 AI 語音報告朗讀助理 (Audio Reader Assistant)</h4>
-                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #c7d2fe;">點擊右側按鈕，即可使用真人語音聆聽本份高階人才評估總結。</p>
-            </div>
-            <button onclick="speakReport()" style="background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(99,102,241,0.4);">
-                ▶ 播放語音朗讀 (Play Audio)
-            </button>
-            <button onclick="stopReport()" style="background: #334155; color: #94a3b8; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin-left: 8px;">
-                ⏹ 停止
-            </button>
-        </div>
-
+        <!-- 全域語音停止控制 -->
         <script>
-        function speakReport() {{
+        function speakText(text) {{
             if ('speechSynthesis' in window) {{
                 window.speechSynthesis.cancel();
-                let text = "{speech_text}";
                 let utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'zh-CN';
                 utterance.rate = 1.0;
@@ -206,15 +195,29 @@ def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dep
         }}
         </script>
 
+        <!-- 🔊 頂部總覽朗讀列 -->
+        <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 15px 20px; border-radius: 10px; border: 1px solid #4338ca; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h4 style="margin: 0; color: #818cf8; font-size: 1rem;">🔊 AI 分段語音朗讀助理</h4>
+                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #c7d2fe;">您可以點擊下方各段落的專屬按鈕，輕鬆聆聽不同區塊的詳細報告。</p>
+            </div>
+            <button onclick="stopReport()" style="background: #334155; color: #94a3b8; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
+                ⏹ 停止播放
+            </button>
+        </div>
+
         <!-- 💡 快速導覽與雙生日數字矩陣 -->
         <div style="background: #131c2e; padding: 25px; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 30px; border-left: 4px solid #3b82f6;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h3 style="color: #3b82f6; margin: 0; font-size: 1.2rem;">💡 Dual-Track Executive Summary & DOB Number Architecture</h3>
                 <span style="background: rgba(16,185,129,0.2); color: #10b981; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">{analysis_source}</span>
             </div>
+            <div style="margin-top: 15px; margin-bottom: 15px;">
+                <button onclick="speakText('{speech_summary}')" style="background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
+                    ▶ 朗讀此段摘要 (Listen Summary)
+                </button>
+            </div>
             <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 15px; line-height: 1.6;">
-                This matrix integrates exact DOB-derived numerology and elemental frequencies for both candidate and supervisor.<br>
-                <em>(本矩陣精確結合員工與直屬主管輸入之生日數字與五行頻率。)</em><br><br>
                 <strong>受評估員工 (Candidate)</strong>：<span style="color: #e2e8f0; font-weight: bold;">{name}</span> (DOB: {birth_date.strftime('%Y-%m-%d')})<br>
                 <strong>目標應徵部門與職務 (Target Assignment)</strong>：<span style="color: #3b82f6; font-weight: bold;">{dept} — {role} ({level})</span><br>
                 <strong>直屬主管配置 (Supervising Unit)</strong>：<span style="color: #10b981; font-weight: bold;">{m_dept}</span> ({m_lvl} | DOB: {m_bday.strftime('%Y-%m-%d')})
@@ -243,7 +246,12 @@ def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dep
 
         <!-- 🟣 Part 1: 個人本質解構 -->
         <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #a855f7; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-            <div style="font-size: 1.25rem; font-weight: 700; color: #a855f7; margin-bottom: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">🟣 Part 1: Individual Essence, Role Fit & Universal Scenario Probing</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 1.25rem; font-weight: 700; color: #a855f7;">🟣 Part 1: Individual Essence & Role Fit</div>
+                <button onclick="speakText('{speech_p1}')" style="background: #3b0764; color: #d8b4fe; border: 1px solid #a855f7; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
+                    ▶ 朗讀第一部分 (Listen Part 1)
+                </button>
+            </div>
             <p style="font-size: 0.95rem; color: #a855f7; font-weight: bold; margin-bottom: 15px;">【第一部分：個人本質解構、崗位適配與通用場景深度探測】</p>
             
             <h4 style="color: #e2e8f0; font-size: 1.05rem; margin: 20px 0 10px 0;">✨ 1. Core Competencies & Strategic Advantages / 【核心優勢與戰略天賦】</h4>
@@ -266,7 +274,12 @@ def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dep
 
         <!-- 🔵 Part 2: 跨部門流動與多元適配建議 -->
         <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #3b82f6; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-            <div style="font-size: 1.25rem; font-weight: 700; color: #3b82f6; margin-bottom: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">🔵 Part 2: Cross-Departmental Mobility & Alternative Fit</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 1.25rem; font-weight: 700; color: #3b82f6;">🔵 Part 2: Cross-Departmental Mobility</div>
+                <button onclick="speakText('{speech_p2}')" style="background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
+                    ▶ 朗讀第二部分 (Listen Part 2)
+                </button>
+            </div>
             <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.8;">
                 <strong>Strategic Mobility Assessment</strong>:<br>
                 Based on our latest updated local knowledge base and AI synthesis, while the candidate is exceptionally well-suited for <strong>{dept}</strong>, their systemic orientation grants them organizational mobility toward <strong>Strategic Planning</strong> or <strong>Brand Marketing</strong>.<br>
@@ -276,7 +289,12 @@ def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dep
 
         <!-- 🟢 Part 3: 主管與下屬協作磁場與頻率對齊分析模組 -->
         <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #10b981; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-            <div style="font-size: 1.25rem; font-weight: 700; color: #10b981; margin-bottom: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">🟢 Part 3: Supervisor-Subordinate Synergy & Frequency Alignment Matrix</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 1.25rem; font-weight: 700; color: #10b981;">🟢 Part 3: Supervisor-Subordinate Synergy</div>
+                <button onclick="speakText('{speech_p3}')" style="background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
+                    ▶ 朗讀第三部分 (Listen Part 3)
+                </button>
+            </div>
             <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.8;">
                 <strong>Governance Baseline Configuration / 雙向治理基準配置</strong>：<br>
                 * <strong>Supervising Unit</strong>：<code style="color: #e2e8f0; font-weight: bold;">{m_dept}</code> ｜ <code style="color: #e2e8f0;">{m_lvl}</code> (Life Path {mgr_lp})<br>
@@ -335,12 +353,12 @@ if app_mode == "🌟 模式一：旗艦級雙語人才與協作評估報告":
             candidate_level = st.selectbox("職級 Level", ["Senior Manager", "Manager", "Specialist", "Junior"])
 
     if st.button("🚀 執行 Google AI 雲端分析並生成專業報告"):
-        st.success("分析完成！已成功調用雙軌智慧架構與語音朗讀助理。")
+        st.success("分析完成！已成功調用雙軌智慧架構與分段語音朗讀助理。")
         report_output = generate_dual_track_master_report(
             user_name, birth_date, target_department, job_role, candidate_level,
             manager_dept, manager_level, manager_birthday, BUILTIN_API_KEY
         )
-        components.html(report_output, height=2600, scrolling=True)
+        components.html(report_output, height=2700, scrolling=True)
 
 else:
     # ==================== 模式二：本地智慧資料庫與廚房資訊常態更新 ====================
@@ -379,4 +397,4 @@ else:
             st.rerun()
 
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 13px;'>© 2026 TBM-HR Platform. Google Gemini API, Audio Reader & Live Storage Synchronization 🔯</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 13px;'>© 2026 TBM-HR Platform. Google Gemini API, Segmented Audio Reader & Live Storage Synchronization 🔯</p>", unsafe_allow_html=True)
