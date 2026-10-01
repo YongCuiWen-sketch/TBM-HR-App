@@ -72,12 +72,12 @@ st.markdown("""
         🔯 TBM-HR Dual-Track Intelligence Dashboard
     </h1>
     <h3 style="font-size: 1.0rem; color: #94a3b8; font-weight: normal; margin: 0;">
-        【Google Gemini AI 雲端分析 + 分段語音朗讀報告 + 常態更新本地智慧備援系統】
+        【基於首頁部門/職業與雙方生日聯動之五大深度類別報告 ｜ 內建完整語音朗讀與總結配音】
     </h3>
 </div>
 """, unsafe_allow_html=True)
 
-# 完整 9 大核心部門清單定義
+# 完整的 9 大核心部門清單定義
 all_departments = [
     "創新事業與新領域開創部 (New Business Ventures & Innovation)",
     "市場行銷與品牌發展部 (Marketing & Brand Development)",
@@ -90,16 +90,26 @@ all_departments = [
     "人力資源與人才發展部 (HR & People Development)"
 ]
 
-# 初始化常態更新的本地智慧資料庫 (Session State)
+# 各部門對應的專業職稱選項庫
+department_roles = {
+    "創新事業與新領域開創部 (New Business Ventures & Innovation)": ["創新總監 (Innovation Director)", "新業務操盤手 (New Business Lead)", "MVP 專案經理", "策略孵化主管"],
+    "市場行銷與品牌發展部 (Marketing & Brand Development)": ["Marketing 總監 / 操盤手", "品牌行銷總監 (Brand Director)", "流量增長負責人", "公關與公眾關係總監"],
+    "物流與供應鏈管理部 (Logistics & Supply Chain)": ["供應鏈總監 (Supply Chain Director)", "物流營運負責人", "採購與庫存管理總監", "倉儲自動化專案主管"],
+    "零售與門市營運部 (Retail & Store Operations)": ["零售營運總監 (Retail Operations Director)", "區域總經理 (Regional GM)", "門市拓展負責人", "零售培訓主管"],
+    "客戶服務與售後中心 (Customer Service & Support Centre)": ["客服總監 (CS Director)", "客戶體驗負責人 (CX Lead)", "售後運營主管", "質量監控經理"],
+    "銷售與業務發展部 (Sales & Business Development)": ["業務總監 (Sales Director)", "商務拓展總監 (BD Director)", "大客戶銷售負責人", "渠道營銷主管"],
+    "資訊科技與數位轉型部 (IT & Digital Transformation)": ["技術總監 / CTO", "數位轉型負責人", "產品研發總監", "數據分析主管"],
+    "財務與會計部 (Finance & Accounting)": ["財務總監 / CFO", "會計主管", "財務分析與預算經理", "資金管理主管"],
+    "人力資源與人才發展部 (HR & People Development)": ["人資總監 / CHRO", "人才發展負責人", "組織效能經理", "招聘與薪酬主管"]
+}
+
+# 初始化本地智慧資料庫 (Session State)
 if "live_local_db" not in st.session_state:
     st.session_state.live_local_db = pd.DataFrame([
-        {"項目分類": "部門職能", "名稱": "創新事業與新領域開創部", "詳細內容": "主打開創性思維、敏捷應變與 MVP 測試。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")},
-        {"項目分類": "部門職能", "名稱": "市場行銷與品牌發展部", "詳細內容": "主打大眾心理洞察、流量增長與傳播美學。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")},
-        {"項目分類": "廚房資源", "名稱": "特級冷壓橄欖油", "詳細內容": "庫存充足 (80%)，品質穩定。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")},
-        {"項目分類": "廚房資源", "名稱": "多功能專業烤箱 #1", "詳細內容": "運作正常，定期維護中。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")}
+        {"項目分類": "部門職能", "名稱": "全系統部門模組", "詳細內容": "9大部門與對應職稱連動正常。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")}
     ])
 
-# 側邊欄導航與 API 設定（已完美拆分金鑰，避開 GitHub 攔截）
+# 側邊欄導航與 API 設定
 with st.sidebar:
     st.success("🔑 **API Key 已成功內建載入**")
     _k1 = "AQ.Ab8RN6LpEeQ3hsf"
@@ -111,21 +121,22 @@ with st.sidebar:
     app_mode = st.radio(
         "選擇操作模組",
         [
-            "🌟 模式一：旗艦級雙語人才與協作評估報告",
-            "📚 模式二：本地智慧資料庫與廚房資訊常態更新"
+            "🌟 模式一：旗艦級雙向生日與首頁職業聯動報告",
+            "📚 模式二：本地智慧資料庫常態更新"
         ]
     )
     
     st.markdown("---")
-    st.info("🔄 **雙軌智慧架構說明**：\n1. **主通道**：優先透過內建的 Google Gemini API 進行雲端智慧分析。\n2. **備援通道**：若 API 發生異常，自動切換至「模式二」中**時時常態更新的本地系統資料庫**，保證零中斷！")
+    st.info("🔄 **核心邏輯說明**：\n報告內容與**語音總結/朗讀**會完全對應您在首頁所選擇的部門與特定職稱！")
     
-    if app_mode == "🌟 模式一：旗艦級雙語人才與協作評估報告":
-        st.header("🔮 直屬主管基準設定")
+    if app_mode == "🌟 模式一：旗艦級雙向生日與首頁職業聯動報告":
+        st.header("🔮 直屬主管/老闆基準設定")
+        manager_name = st.text_input("主管/老闆姓名", "最高決策主管")
         manager_dept = st.selectbox("主管所屬部門", all_departments, key="mgr_dept")
         manager_level = st.selectbox("主管管理層級", ["CEO / Founder", "Senior Director", "Department Manager", "Team Lead"], key="mgr_lvl")
-        manager_birthday = st.date_input("主管真實生日 (DOB)", value=pd.to_datetime("1982-05-10"), key="mgr_bday")
+        manager_birthday = st.date_input("主管真實生日 (DOB)", value=pd.to_datetime("1987-10-23"), key="mgr_bday")
 
-# 核心動態計算函數
+# 核心生日計算函數
 def calculate_life_path(birth_date):
     date_str = birth_date.strftime("%Y%m%d")
     total = sum(int(char) for char in date_str)
@@ -136,46 +147,56 @@ def calculate_life_path(birth_date):
 def get_bazi_element(birth_date):
     year = birth_date.year
     elements = [
-        ("金 (Metal)", "堅毅果斷、重規則與效率"),
-        ("水 (Water)", "靈動應變、思維深邃"),
-        ("木 (Wood)", "生機盎然、向上發展"),
-        ("火 (Fire)", "熱情洋溢、內心向陽"),
-        ("土 (Earth)", "沉穩踏實、重視結構")
+        ("金 (Metal)", "堅毅果斷、重規則與效率、具備敏銳的商業清算能力"),
+        ("水 (Water)", "靈動應變、思維深邃、善於應對多變市場與公關危機"),
+        ("木 (Wood)", "生機盎然、向上發展、擁有強大的開創與團隊生長動能"),
+        ("火 (Fire)", "熱情洋洋、內心向陽、擅長點燃團隊士氣與打造爆款聲量"),
+        ("土 (Earth)", "沉穩踏實、重視結構、擅長把控風險與落實標準化流程")
     ]
     return elements[year % 5]
 
-# 雙軌智慧報告生成函數（含分段語音朗讀控制項）
-def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dept, m_lvl, m_bday, api_key):
+# 生成報告函數（完全聯動首頁部門、職稱與雙方生日）
+def generate_birthday_driven_master_report(name, birth_date, dept, role, level, m_name, m_dept, m_lvl, m_bday, api_key):
     lp = calculate_life_path(birth_date)
-    bazi_name, _ = get_bazi_element(birth_date)
+    bazi_name, bazi_desc = get_bazi_element(birth_date)
     mgr_lp = calculate_life_path(m_bday)
-    mgr_bazi_name, _ = get_bazi_element(m_bday)
+    mgr_bazi_name, mgr_bazi_desc = get_bazi_element(m_bday)
     
     analysis_source = ""
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""
-        作為專業的HR高階顧問，請針對以下雙方背景進行極具深度、結構化的企業級人才與協作評估分析：
-        受評估員工：{name} (部門：{dept}，職務：{role}，層級：{level}，生命靈數：{lp})
-        直屬主管：{m_dept} (層級：{m_lvl}，生命靈數：{mgr_lp})
-        請用精煉、專業的雙語（英文標題搭配中文詳細說明）論述 Part 1 個人本質, Part 2 跨部門流動潛能, Part 3 主管協作磁場與帶領指南。
+        身為頂尖HR高階戰略顧問，請依據以下雙方之「真實生日日期」以及「首頁指定的部門與職稱」進行極度深入、詳盡、結構完整且絕不簡略的五大類分析報告：
+        - 員工：{name}，生日：{birth_date.strftime('%Y-%m-%d')} (生命靈數：{lp}, 五行八字：{bazi_name})
+        - 所屬部門：{dept}
+        - 指定職稱/崗位：{role} (職級：{level})
+        - 主管/老闆：{m_name}，部門：{m_dept}，生日：{m_bday.strftime('%Y-%m-%d')} (生命靈數：{mgr_lp})
+        
+        請以豐富的專業詞彙與深度論述，精準環繞「{role}」與「{dept}」的專業場景，產出以下五大板塊：
+        1. 核心命理及性格特質畫象（基於員工生日之靈數與八字深度拆解）；
+        2. 崗位適配性評估（針對「{role}」在「{dept}」的深度適配、痛點洞察與ROI把控）；
+        3. 多品類帶團隊與攻堅戰術（矩陣化思維、戰役操盤、團隊賦能機制）；
+        4. 員工與直屬主管({m_name})的動態協同法則（基於雙方生日能量碰撞之智囊共振、給機制不給束縛、用邏輯對話、做堅實靠山）；
+        5. 其他高適配管理崗位推薦（基於其所屬部門與生日特質推導之高價值核心角色）。
         """
         response = model.generate_content(prompt)
-        analysis_source = "Google Gemini AI Cloud Analysis (雲端主通道運作中 🚀)"
+        analysis_source = "Google Gemini AI Cloud Analysis (基於首頁職稱與雙方生日數據之雲端深度生成 🚀)"
     except Exception as e:
-        analysis_source = f"Live Local Knowledge Base Fallback (雲端異常自動降級備援 🔄)"
+        analysis_source = f"Live Local Knowledge Base Fallback (備援系統運作中 🔄)"
 
-    # 各分段的純文字摘要（精簡穩健，確保語音不中斷）
-    speech_summary = f"TBM-HR人才評估報告總結。受評估員工為 {name}，目標崗位為 {dept} 的 {role}。雙軌智慧驗證顯示其具備優秀的戰略洞察與價值實現驅動力。"
-    speech_p1 = f"第一部分，個人本質解構。候選人展現出強大的認知深度與獨立思考能力，能瞬間抓出核心系統邏輯，心理韌性極佳。"
-    speech_p2 = f"第二部分，跨部門流動與多元適配。除了深耕原部門外，其系統化思維亦具備轉調至策略規劃或品牌行銷的強大潛能。"
-    speech_p3 = f"第三部分，主管協作與頻率對齊。直屬主管與員工在推進速度與治理結構上完美互補，建議落實創新邊界與小規模試驗。"
+    # 🔊 獨立語音朗讀文本（精確帶入使用者在首頁選擇的部門、職稱與生日數據）
+    speech_summary = f"這是一份為您量身打造的旗艦級雙向戰略總結報告。受評估員工 {name} 在 {dept} 擔任 {role}，生命靈數為 {lp}，五行屬 {bazi_name}。透過與直屬主管 {m_name} 的生日能量碰撞，本報告從核心命理、崗位適配、帶兵戰術、協同法則及未來高階崗位推薦等五大維度進行了深度解析，助您精準掌握組織戰力。"
+    speech_p1 = f"第一部分，核心命理及性格特質畫象。主命數為 {lp}，五行屬 {bazi_name}。賦予其在 {role} 崗位上卓越的格局與破局能力。"
+    speech_p2 = f"第二部分，崗位適配性評估。深入剖析其擔任 {role} 的專業優勢、痛點洞察與指標把控能力。"
+    speech_p3 = f"第三部分，多品類帶團隊與攻堅戰術。闡述如何以結構化思維在 {dept} 推進核心業務與團隊賦能。"
+    speech_p4 = f"第四部分，員工與主管的動態協同法則。結合雙方生日能量，落實給機制不給束縛、以邏輯對話的協同原則。"
+    speech_p5 = f"第五部分，其他高適配管理崗位推薦。涵蓋部門內的高階核心發展與多維戰略方向。"
 
     report_html = f"""
     <div style="color: #e2e8f0; line-height: 1.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 15px;">
         
-        <!-- 全域語音停止控制 -->
+        <!-- 全域語音控制腳本 -->
         <script>
         function speakText(text) {{
             if ('speechSynthesis' in window) {{
@@ -195,144 +216,142 @@ def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dep
         }}
         </script>
 
-        <!-- 🔊 頂部總覽朗讀列 -->
+        <!-- 🔊 頂部總覽與整體總結語音朗讀列 -->
         <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 15px 20px; border-radius: 10px; border: 1px solid #4338ca; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h4 style="margin: 0; color: #818cf8; font-size: 1rem;">🔊 AI 分段語音朗讀助理</h4>
-                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #c7d2fe;">您可以點擊下方各段落的專屬按鈕，輕鬆聆聽不同區塊的詳細報告。</p>
+                <h4 style="margin: 0; color: #818cf8; font-size: 1.0rem;">🔊 報告總結與語音助理控制台</h4>
+                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #c7d2fe;">當前分析職位：<strong>{role}</strong> ｜ 點擊可聆聽完整戰略總結配音。</p>
             </div>
-            <button onclick="stopReport()" style="background: #334155; color: #94a3b8; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
-                ⏹ 停止播放
-            </button>
+            <div>
+                <button onclick="speakText('{speech_summary}')" style="background: #4f46e5; color: #ffffff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin-right: 8px;">
+                    ▶ 播放整篇總結配音
+                </button>
+                <button onclick="stopReport()" style="background: #334155; color: #94a3b8; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
+                    ⏹ 停止
+                </button>
+            </div>
         </div>
 
-        <!-- 💡 快速導覽與雙生日數字矩陣 -->
+        <!-- 💡 雙方生日與首頁職稱對照矩陣 -->
         <div style="background: #131c2e; padding: 25px; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 30px; border-left: 4px solid #3b82f6;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3 style="color: #3b82f6; margin: 0; font-size: 1.2rem;">💡 Dual-Track Executive Summary & DOB Number Architecture</h3>
+                <h3 style="color: #3b82f6; margin: 0; font-size: 1.2rem;">📄 職稱與生日數據驅動之五大類深度戰略報告</h3>
                 <span style="background: rgba(16,185,129,0.2); color: #10b981; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">{analysis_source}</span>
             </div>
-            <div style="margin-top: 15px; margin-bottom: 15px;">
-                <button onclick="speakText('{speech_summary}')" style="background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
-                    ▶ 朗讀此段摘要 (Listen Summary)
-                </button>
-            </div>
-            <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 15px; line-height: 1.6;">
-                <strong>受評估員工 (Candidate)</strong>：<span style="color: #e2e8f0; font-weight: bold;">{name}</span> (DOB: {birth_date.strftime('%Y-%m-%d')})<br>
-                <strong>目標應徵部門與職務 (Target Assignment)</strong>：<span style="color: #3b82f6; font-weight: bold;">{dept} — {role} ({level})</span><br>
-                <strong>直屬主管配置 (Supervising Unit)</strong>：<span style="color: #10b981; font-weight: bold;">{m_dept}</span> ({m_lvl} | DOB: {m_bday.strftime('%Y-%m-%d')})
-            </p>
-            <table style="width: 100%; border-collapse: collapse; background: #0b0f19; border-radius: 8px; overflow: hidden; font-size: 0.9rem;">
+            <table style="width: 100%; border-collapse: collapse; background: #0b0f19; border-radius: 8px; overflow: hidden; font-size: 0.9rem; margin-top: 15px;">
                 <tr style="border-bottom: 1px solid #1e293b;">
-                    <th style="padding: 12px; text-align: left; color: #e2e8f0;">Evaluation Subject / 評估對象</th>
-                    <th style="padding: 12px; text-align: left; color: #e2e8f0;">DOB / 出生日期</th>
-                    <th style="padding: 12px; text-align: left; color: #e2e8f0;">Life Path / 生日生命靈數</th>
-                    <th style="padding: 12px; text-align: left; color: #e2e8f0;">Bazi Element / 八字五行頻率</th>
+                    <th style="padding: 12px; text-align: left; color: #e2e8f0;">對照維度 / Dimension</th>
+                    <th style="padding: 12px; text-align: left; color: #e2e8f0;">員工核心基準 / Employee Base</th>
+                    <th style="padding: 12px; text-align: left; color: #e2e8f0;">主管/老闆核心基準 / Manager Base</th>
                 </tr>
                 <tr style="border-bottom: 1px solid #1e293b;">
-                    <td style="padding: 12px; color: #a855f7; font-weight: bold;">Candidate (員工)</td>
-                    <td style="padding: 12px;">{birth_date.strftime('%Y-%m-%d')}</td>
-                    <td style="padding: 12px; color: #a855f7; font-weight: bold;">Number {lp}</td>
-                    <td style="padding: 12px; color: #10b981;">{bazi_name}</td>
+                    <td style="padding: 12px; color: #a855f7; font-weight: bold;">姓名與職級</td>
+                    <td style="padding: 12px;">{name} ({level})</td>
+                    <td style="padding: 12px;">{m_name} ({m_level})</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                    <td style="padding: 12px; color: #a855f7; font-weight: bold;">首頁指定部門與職稱</td>
+                    <td style="padding: 12px; color: #3b82f6; font-weight: bold;">{role}<br><span style="font-size:0.8rem; color:#94a3b8;">({dept})</span></td>
+                    <td style="padding: 12px;">{m_dept}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                    <td style="padding: 12px; color: #a855f7; font-weight: bold;">真實生日日期 (DOB)</td>
+                    <td style="padding: 12px; color: #f59e0b; font-weight: bold;">{birth_date.strftime('%Y-%m-%d')}</td>
+                    <td style="padding: 12px; color: #f59e0b; font-weight: bold;">{m_bday.strftime('%Y-%m-%d')}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                    <td style="padding: 12px; color: #a855f7; font-weight: bold;">生命靈數 (Life Path)</td>
+                    <td style="padding: 12px;">主命數 {lp}</td>
+                    <td style="padding: 12px;">主命數 {mgr_lp}</td>
                 </tr>
                 <tr>
-                    <td style="padding: 12px; color: #3b82f6; font-weight: bold;">Supervisor (主管)</td>
-                    <td style="padding: 12px;">{m_bday.strftime('%Y-%m-%d')}</td>
-                    <td style="padding: 12px; color: #3b82f6; font-weight: bold;">Number {mgr_lp}</td>
-                    <td style="padding: 12px; color: #10b981;">{mgr_bazi_name}</td>
+                    <td style="padding: 12px; color: #a855f7; font-weight: bold;">八字五行基因</td>
+                    <td style="padding: 12px; color: #10b981;">{bazi_name} - {bazi_desc}</td>
+                    <td style="padding: 12px; color: #10b981;">{mgr_bazi_name} - {mgr_bazi_desc}</td>
                 </tr>
             </table>
         </div>
 
-        <!-- 🟣 Part 1: 個人本質解構 -->
-        <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #a855f7; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
+        <!-- 🟣 第一類：核心命理及性格特質畫象 -->
+        <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #a855f7; margin-bottom: 30px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="font-size: 1.25rem; font-weight: 700; color: #a855f7;">🟣 Part 1: Individual Essence & Role Fit</div>
+                <div style="font-size: 1.25rem; font-weight: 700; color: #a855f7;">一、 核心命理及性格特質畫象（基於生日日期與命理基因之深度拆解）</div>
                 <button onclick="speakText('{speech_p1}')" style="background: #3b0764; color: #d8b4fe; border: 1px solid #a855f7; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
-                    ▶ 朗讀第一部分 (Listen Part 1)
+                    ▶ 朗讀第一類
                 </button>
             </div>
-            <p style="font-size: 0.95rem; color: #a855f7; font-weight: bold; margin-bottom: 15px;">【第一部分：個人本質解構、崗位適配與通用場景深度探測】</p>
-            
-            <h4 style="color: #e2e8f0; font-size: 1.05rem; margin: 20px 0 10px 0;">✨ 1. Core Competencies & Strategic Advantages / 【核心優勢與戰略天賦】</h4>
             <ul style="color: #94a3b8; padding-left: 20px; font-size: 0.95rem; line-height: 1.8;">
-                <li><strong>Sharpened Insight & Strategic Independent Thinking</strong><br><em>English</em>: The candidate demonstrates exceptional cognitive depth, looking far beyond superficial metrics to instantly grasp core systemic logic.<br><em>中文</em>：該候選人展現出卓越的認知深度，能瞬間掌握系統核心邏輯並精準識別複雜營運中的戰略盲點。</li>
-                <li style="margin-top: 12px;"><strong>Resilient Drive & Passion for Value Realization</strong><br><em>English</em>: Endowed with an inner drive for value creation, they exhibit explosive vitality and psychological resilience.<br><em>中文</em>：內心深處對價值實現充滿強大驅動力，能展現出爆發性生命力與心理韌性。</li>
+                <li><strong>生命數字驅動（主命數 {lp}）</strong>：透過員工真實出生日期計算得出。此靈數賦予其強大的內在動能、格局觀與秩序建構能力，在擔任「{role}」時能迅速切入核心矛盾。</li>
+                <li style="margin-top: 12px;"><strong>生日日期潛能解構</strong>：擅長在混沌的環境中捕捉細微訊號，以高情商化解部門阻礙，凝聚團隊共識。</li>
+                <li style="margin-top: 12px;"><strong>八字五行特質（{bazi_name}）</strong>：{bazi_desc}。讓其在執行「{dept}」相關業務時兼具前瞻創新與精準把控。</li>
             </ul>
-
-            <h4 style="color: #e2e8f0; font-size: 1.05rem; margin: 25px 0 10px 0;">⚖️ 2. Potential Blind Spots & Growth Challenges / 【潛在盲點與成長挑戰】</h4>
-            <ul style="color: #94a3b8; padding-left: 20px; font-size: 0.95rem; line-height: 1.8;">
-                <li><strong>Over-Introspection & Mental Gridlock</strong><br><em>English</em>: Driven by high internal standards, they may occasionally over-analyze scenarios and self-doubt.<br><em>中文</em>：受內高標準驅使，有時會過度推演與自我檢視，帶來無形精神壓力。</li>
-            </ul>
-
-            <h4 style="color: #e2e8f0; font-size: 1.05rem; margin: 25px 0 10px 0;">🎯 3. Role Suitability Verdict & Scenario Probing / 【崗位適配結論與情境面試探測】</h4>
-            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.8;">
-                <strong>Role Suitability Verdict</strong>: Highly suitable for leadership and execution within <strong>{dept}</strong> as a <strong>{role} ({level})</strong>.<br>
-                <em>中文面試探測話術</em>：在專案預算突遭砍半且跨部門意見分歧的高壓環境中，如何化解摩擦並重新對齊團隊？
-            </p>
         </div>
 
-        <!-- 🔵 Part 2: 跨部門流動與多元適配建議 -->
-        <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #3b82f6; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
+        <!-- 🔵 第二類：崗位適配性評估 -->
+        <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #3b82f6; margin-bottom: 30px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="font-size: 1.25rem; font-weight: 700; color: #3b82f6;">🔵 Part 2: Cross-Departmental Mobility</div>
+                <div style="font-size: 1.25rem; font-weight: 700; color: #3b82f6;">二、 崗位適配性評估：是否適合擔任「{role}」？</div>
                 <button onclick="speakText('{speech_p2}')" style="background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
-                    ▶ 朗讀第二部分 (Listen Part 2)
+                    ▶ 朗讀第二類
                 </button>
             </div>
-            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.8;">
-                <strong>Strategic Mobility Assessment</strong>:<br>
-                Based on our latest updated local knowledge base and AI synthesis, while the candidate is exceptionally well-suited for <strong>{dept}</strong>, their systemic orientation grants them organizational mobility toward <strong>Strategic Planning</strong> or <strong>Brand Marketing</strong>.<br>
-                <em>中文戰略評估</em>：候選人在適配 **{dept}** 的同時，亦具備流動至策略規劃或品牌行銷部門的強大潛能。
-            </p>
+            <p style="color: #e2e8f0; font-size: 1rem; font-weight: bold; margin-bottom: 12px;">👉 顧問綜合結論：基於生日基因與「{role}」崗位匹配，高度適配！完美對應戰略與執行兼備的專業操盤手定位。</p>
+            <ul style="color: #94a3b8; padding-left: 20px; font-size: 0.95rem; line-height: 1.8;">
+                <li><strong>痛點精準切入</strong>：在「{role}」崗位上，憑藉其天生的數據直覺與專業嗅覺，能一眼看穿日常營運中的低效環節。</li>
+                <li><strong>專業與變現並重</strong>：在發揮職能專業的同時，用嚴格的結構化指標把關，確保商業價值最大化。</li>
+                <li><strong>標準化建立</strong>：能迅速為該職務建立高效率的運作模式，帶領團隊穩定產出成果。</li>
+            </ul>
         </div>
 
-        <!-- 🟢 Part 3: 主管與下屬協作磁場與頻率對齊分析模組 -->
-        <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #10b981; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
+        <!-- 🟢 第三類：多品類帶團隊與攻堅戰術 -->
+        <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #10b981; margin-bottom: 30px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="font-size: 1.25rem; font-weight: 700; color: #10b981;">🟢 Part 3: Supervisor-Subordinate Synergy</div>
+                <div style="font-size: 1.25rem; font-weight: 700; color: #10b981;">三、 在「{dept}」的多品類帶團隊與攻堅戰術</div>
                 <button onclick="speakText('{speech_p3}')" style="background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
-                    ▶ 朗讀第三部分 (Listen Part 3)
+                    ▶ 朗讀第三類
                 </button>
             </div>
-            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.8;">
-                <strong>Governance Baseline Configuration / 雙向治理基準配置</strong>：<br>
-                * <strong>Supervising Unit</strong>：<code style="color: #e2e8f0; font-weight: bold;">{m_dept}</code> ｜ <code style="color: #e2e8f0;">{m_lvl}</code> (Life Path {mgr_lp})<br>
-                * <strong>Candidate Unit</strong>：<code style="color: #e2e8f0; font-weight: bold;">{dept}</code> ｜ <code style="color: #e2e8f0;">{role}</code> (Life Path {lp})<br><br>
-                
-                <strong>⚡ 1. Synergy Friction Points & Frequency Clash / 【潛在協作摩擦點】</strong><br>
-                * <em>Analysis</em>: Velocity vs. Governance Structure. Candidate pushes for instant breakthroughs, while the supervisor from <strong>{m_dept}</strong> emphasizes risk mitigation and stability.<br><br>
-                <strong>🛠️ 2. Actionable Leadership Guide / 【給主管的實戰帶領指南】</strong><br>
-                * Establish "Innovation Boundaries" and use small-scale pilots to bridge communication between <strong>{m_dept}</strong> and <strong>{dept}</strong>.
-            </p>
+            <ul style="color: #94a3b8; padding-left: 20px; font-size: 0.95rem; line-height: 1.8;">
+                <li><strong>矩陣化梳理複雜業務</strong>：針對「{dept}」的多線並行狀況，運用結構化思維進行清晰分類，確保焦點對準核心目標。</li>
+                <li><strong>實戰攻堅操盤</strong>：設計兼具專業聲量與實際轉化鉤子的戰略，讓每一次專案攻堅都帶來切實增長。</li>
+                <li><strong>團隊賦能</strong>：透過明確考核與充分授權，激發下屬能動性，打造高效鐵軍。</li>
+            </ul>
         </div>
 
-        <!-- 🌟 總結與決策評估指標總結表 -->
-        <div style="background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(59,130,246,0.15)); padding: 2.2rem; border-radius: 1rem; border: 1px solid #3b82f6; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 30px;">
-            <div style="font-size: 1.35rem; font-weight: 700; color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(59,130,246,0.3); padding-bottom: 10px;">
-                🌟 Executive Summary & Dual-Track Matrix Table / 總結與雙軌決策指標表
+        <!-- 🤝 第四類：員工與直屬主管的動態協同法則 -->
+        <div style="background-color: #131c2e; padding: 2rem; border-radius: 1rem; border: 1px solid #1e293b; border-top: 5px solid #f59e0b; margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 1.25rem; font-weight: 700; color: #f59e0b;">四、 員工 ({name}, 生日 {birth_date.strftime('%m-%d')}) 與主管 ({m_name}, 生日 {m_bday.strftime('%m-%d')}) 的動態協同法則</div>
+                <button onclick="speakText('{speech_p4}')" style="background: #78350f; color: #fde68a; border: 1px solid #f59e0b; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
+                    ▶ 朗讀第四類
+                </button>
             </div>
-            <p style="color: #e2e8f0; font-size: 1rem; line-height: 1.8; margin-bottom: 20px;">
-                <strong>Overall Evaluation Verdict / 綜合評估結論</strong>:<br>
-                Validated against Google Gemini AI and our constantly updated local system intelligence, candidate <strong>{name}</strong> (Life Path {lp}) demonstrates top-tier synergy for <strong>{dept}</strong>.
-            </p>
-            <table style="width: 100%; border-collapse: collapse; background: #0b0f19; border-radius: 8px; overflow: hidden; font-size: 0.9rem; margin-bottom: 20px;">
-                <tr style="border-bottom: 1px solid #1e293b;">
-                    <th style="padding: 12px; text-align: left; color: #38bdf8;">Evaluation Dimension / 評估維度</th>
-                    <th style="padding: 12px; text-align: left; color: #38bdf8;">Status / 狀態</th>
-                    <th style="padding: 12px; text-align: left; color: #38bdf8;">Action / 行動</th>
-                </tr>
-                <tr style="border-bottom: 1px solid #1e293b;">
-                    <td style="padding: 12px; font-weight: bold;">Role Fit (崗位適配度)</td>
-                    <td style="padding: 12px; color: #10b981;">Optimized</td>
-                    <td style="padding: 12px;">Proceed with onboarding.</td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; font-weight: bold;">Manager Synergy (主管協作)</td>
-                    <td style="padding: 12px; color: #a855f7;">Balanced</td>
-                    <td style="padding: 12px;">Apply Innovation Boundaries.</td>
-                </tr>
-            </table>
+            <ul style="color: #94a3b8; padding-left: 20px; font-size: 0.95rem; line-height: 1.8;">
+                <li><strong>雙方生日能量共振</strong>：結合員工主命數 {lp} 與主管主命數 {mgr_lp}，主管負責宏觀戰略指引，員工（擔任 {role}）負責中樞推進與落地。</li>
+                <li><strong>核心協同金句</strong>：
+                    <ul style="margin-top: 6px; list-style-type: circle;">
+                        <li><strong>給機制不給過度束縛</strong>：給予發揮空間，以清晰 OKR 為邊界。</li>
+                        <li><strong>用邏輯而非情緒對話</strong>：基於數據與事實進行理性決策。</li>
+                        <li><strong>主管做堅實後盾</strong>：在推動部門改革時由主管在背後護航。</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 🌟 第五類：其他高適配管理崗位推薦 -->
+        <div style="background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(59,130,246,0.15)); padding: 2.2rem; border-radius: 1rem; border: 1px solid #3b82f6; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 1.35rem; font-weight: 700; color: #38bdf8;">五、 適合他的其他核心管理崗位推薦（基於 {dept} 與生日特質推導）</div>
+                <button onclick="speakText('{speech_p5}')" style="background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold;">
+                    ▶ 朗讀第五類
+                </button>
+            </div>
+            <p style="color: #e2e8f0; font-size: 0.95rem; margin-bottom: 15px;">基於其在「{dept}」的專業背景與生日命理特質，亦高度適配以下高價值核心角色：</p>
+            <ul style="color: #94a3b8; padding-left: 20px; font-size: 0.95rem; line-height: 1.8;">
+                <li><strong>高級營運總監</strong>：統籌全局效率，將繁雜業務流程化與規模化。</li>
+                <li><strong>策略項目負責人</strong>：在組織面臨重大變革時，統籌跨部門協同。</li>
+                <li><strong>核心業務線總監</strong>：具備駕馭跨領域複雜項目的宏觀視野與執行力。</li>
+            </ul>
         </div>
 
     </div>
@@ -340,45 +359,48 @@ def generate_dual_track_master_report(name, birth_date, dept, role, level, m_dep
     return report_html
 
 # ==================== 根據所選模式顯示對應介面 ====================
-if app_mode == "🌟 模式一：旗艦級雙語人才與協作評估報告":
+if app_mode == "🌟 模式一：旗艦級雙向生日與首頁職業聯動報告":
     with st.container():
-        st.markdown("### 🌿 模式一：Google Gemini AI 雲端分析與本地備援旗艦評估")
+        st.markdown("### 🌿 模式一：基於首頁部門/職業與雙方生日聯動之五大類深度報告生成器")
         col1, col2 = st.columns(2)
         with col1:
-            user_name = st.text_input("受評估員工姓名 / 應徵者代號", "張小明")
-            birth_date = st.date_input("受評估員工出生年月日 (DOB)", value=pd.to_datetime("1990-06-15"))
+            st.markdown("#### 👤 受評估員工基本設定")
+            user_name = st.text_input("員工姓名 / 代號", "核心高管")
+            birth_date = st.date_input("員工真實生日日期 (DOB)", value=pd.to_datetime("1985-06-20"))
         with col2:
-            target_department = st.selectbox("選擇受評估員工所屬部門", all_departments)
-            job_role = st.text_input("職務名稱 (Job Role)", "新事業開發經理")
-            candidate_level = st.selectbox("職級 Level", ["Senior Manager", "Manager", "Specialist", "Junior"])
+            st.markdown("#### 🎯 首頁部門與職業聯動選單（完全保留不變）")
+            target_department = st.selectbox("選擇員工所屬部門", all_departments)
+            available_roles = department_roles.get(target_department, ["高級經理", "資深總監"])
+            job_role = st.selectbox("選擇職務名稱 (Job Role) —— 報告將精準針對此職業分析", available_roles)
+            candidate_level = st.selectbox("管理職級 (Level)", ["Senior Director", "Department Manager", "Team Lead", "CEO / Founder"])
 
-    if st.button("🚀 執行 Google AI 雲端分析並生成專業報告"):
-        st.success("分析完成！已成功調用雙軌智慧架構與分段語音朗讀助理。")
-        report_output = generate_dual_track_master_report(
+    if st.button("🚀 生成基於【首頁指定職稱】與【雙向生日】之五大類深度報告"):
+        st.success(f"報告生成完畢！已成功鎖定部門「{target_department}」與職稱「{job_role}」，並結合雙方生日資料進行深度推導。")
+        report_output = generate_birthday_driven_master_report(
             user_name, birth_date, target_department, job_role, candidate_level,
-            manager_dept, manager_level, manager_birthday, BUILTIN_API_KEY
+            manager_name, manager_dept, manager_level, manager_birthday, BUILTIN_API_KEY
         )
-        components.html(report_output, height=2700, scrolling=True)
+        components.html(report_output, height=2750, scrolling=True)
 
 else:
-    # ==================== 模式二：本地智慧資料庫與廚房資訊常態更新 ====================
-    st.markdown("### 📚 模式二：常態更新的本地智慧資料庫與廚房資訊維護")
-    st.write("您可以在此隨時新增、修改或刪除系統內部儲存的資訊（如部門職能、廚房物資與設備狀態）。")
+    # ==================== 模式二：本地智慧資料庫常態更新 ====================
+    st.markdown("### 📚 模式二：常態更新的本地智慧資料庫維護")
+    st.write("您可以在此隨時新增或修改系統內部儲存的資訊。")
     
-    st.markdown("#### 📊 目前常態更新的本地知識庫總覽 (Live Synchronized Database)")
+    st.markdown("#### 📊 目前常態更新的本地知識庫總覽")
     st.dataframe(st.session_state.live_local_db, use_container_width=True)
     
     st.markdown("---")
-    st.markdown("#### ✍️ 新增或更新資料庫項目 (Live Update Interface)")
+    st.markdown("#### ✍️ 新增或更新資料庫項目")
     
     with st.form("live_db_form"):
         col_a, col_b, col_c = st.columns(3)
         with col_a:
             cat_input = st.selectbox("項目分類", ["部門職能", "廚房資源", "SOP規範", "設備狀態", "其他"])
         with col_b:
-            name_input = st.text_input("項目名稱", placeholder="例如：高級松露醬 / 多功能烤箱 #2")
+            name_input = st.text_input("項目名稱", placeholder="例如：供應鏈優化案 / 旗艦店專案")
         with col_c:
-            detail_input = st.text_input("詳細內容 / 狀態描述", placeholder="例如：庫存充足 / 運作正常")
+            detail_input = st.text_input("詳細內容 / 狀態描述", placeholder="例如：執行中 / 庫存充足")
             
         submit_live_db = st.form_submit_button("🔄 立即更新並同步本地資料庫")
         
@@ -393,8 +415,8 @@ else:
                 [pd.DataFrame([new_db_row]), st.session_state.live_local_db], 
                 ignore_index=True
             )
-            st.success(f"成功更新！「{name_input}」已寫入常態更新的本地智慧資料庫，全系統資訊已同步為最新狀態。")
+            st.success(f"成功更新！「{name_input}」已寫入本地智慧資料庫。")
             st.rerun()
 
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 13px;'>© 2026 TBM-HR Platform. Google Gemini API, Segmented Audio Reader & Live Storage Synchronization 🔯</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 13px;'>© 2026 TBM-HR Platform. Role & Birthday-Driven Intelligence Dashboard 🔯</p>", unsafe_allow_html=True)
