@@ -110,8 +110,8 @@ if "live_local_db" not in st.session_state:
 if "auto_reports" not in st.session_state:
     st.session_state.auto_reports = {1: None, 2: None, 3: None, 4: None, 5: None}
 
-if "is_generating" not in st.session_state:
-    st.session_state.is_generating = False
+if "auto_step" not in st.session_state:
+    st.session_state.auto_step = 0  # 0: 未開始, 1-5: 正在生成對應部分
 
 # 側邊欄導航與 API 設定
 with st.sidebar:
@@ -131,7 +131,7 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.info("🔄 **系統提示**：\n點擊一次按鈕，系統將自動以 35 秒安全間隔依序生成 1 至 5 部分報告。")
+    st.info("🔄 **系統提示**：\n點擊一次按鈕，系統將自動以 15 秒安全間隔依序循環生成 1 至 5 部分報告。")
     
     if app_mode == "🌟 模式一：全自動戰略報告生成":
         st.header("🔮 直屬主管/老闆基準設定")
@@ -140,13 +140,12 @@ with st.sidebar:
         manager_level = st.selectbox("主管管理層級", ["CEO / Founder", "Senior Director", "Department Manager", "Team Lead"], key="mgr_lvl")
         manager_birthday = st.date_input("主管真實生日 (DOB)", value=pd.to_datetime("1987-10-23"), key="mgr_bday")
 
-# 靈數邏輯：將數字拆開逐位相加至個位數
+# 靈數邏輯
 def reduce_to_single_digit(n):
     while n > 9 and n not in [11, 22, 33]:
         n = sum(int(digit) for digit in str(n))
     return n
 
-# 計算逐位拆解的日加月制約數
 def calculate_constraint_number(birth_date):
     m = birth_date.month
     d = birth_date.day
@@ -156,13 +155,11 @@ def calculate_constraint_number(birth_date):
     final_constraint = reduce_to_single_digit(total)
     return m_reduced, d_reduced, final_constraint
 
-# 單一區塊呼叫 Gemini 3.8 Flash 的函數（設定為 35 秒安全緩衝）
-def generate_auto_chunk(prompt, api_key):
+# 單一區塊呼叫 Gemini 3.8 Flash 的函數
+def generate_single_chunk(prompt, api_key):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-3.8-flash')
     try:
-        # 設置 35 秒間隔確保絕對安全與穩定
-        time.sleep(35)
         response = model.generate_content(prompt)
         res_text = response.text.strip()
         if res_text.startswith("```html"):
@@ -171,7 +168,7 @@ def generate_auto_chunk(prompt, api_key):
             res_text = res_text[:-3]
         return res_text.strip()
     except Exception as e:
-        return f"<div style='color: #ef4444; padding: 15px; background: #1a1a2e; border-radius: 8px;'>此區塊生成暫時逾時，請稍候重試。<br>錯誤細節：{str(e)}</div>"
+        return f"<div style='color: #ef4444; padding: 15px; background: #1a1a2e; border-radius: 8px;'>此區塊生成暫時逾時，將在下次循環自動重試。<br>錯誤細節：{str(e)}</div>"
 
 # ==================== 介面操作模式 ====================
 if app_mode == "🌟 模式一：全自動戰略報告生成":
@@ -180,7 +177,8 @@ if app_mode == "🌟 模式一：全自動戰略報告生成":
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("#### 👤 受評估員工基本設定")
-            user_name = st.text_input("員工姓名 / 代號", "張經理")
+            # 這裡已將預設名稱改為「一個開心的圓光」
+            user_name = st.text_input("員工姓名 / 代號", "一個開心的圓光")
             birth_date = st.date_input("員工真實生日日期 (DOB)", value=pd.to_datetime("1985-06-20"))
         with col2:
             st.markdown("#### 🎯 部門與有序職級選項")
@@ -193,7 +191,7 @@ if app_mode == "🌟 模式一：全自動戰略報告生成":
     m_red, d_red, constraint_num = calculate_constraint_number(birth_date)
     
     base_context = f"""
-    受評估員工：{user_name} (生日: {b_str}, 月份簡化: {m_red}, 日期簡化: {d_red}, 逐位拆解日加月制約數: {constraint_num}, 部門: {target_department}, 職級: {job_role})
+    受評估對象：{user_name} (生日: {b_str}, 月份簡化: {m_red}, 日期簡化: {d_red}, 逐位拆解日加月制約數: {constraint_num}, 部門: {target_department}, 職級: {job_role})
     直屬主管：{manager_name} (生日: {mb_str}, 部門: {manager_dept}, 層級: {manager_level})
     要求：必須具備深度、清晰、結構嚴謹的高階顧問級分析，且每一個論述與段落都必須包含專業的中英文雙語對照。回傳乾淨的 HTML 片段。
     """
@@ -203,58 +201,70 @@ if app_mode == "🌟 模式一：全自動戰略報告生成":
     # 控制按鈕區
     col_a, col_b = st.columns([2, 1])
     with col_a:
-        start_auto = st.button("🚀 一鍵啟動全自動生成 5 段式高階顧問報告")
+        start_auto = st.button("🚀 一鍵啟動全自動無縫循環生成報告")
     with col_b:
         if st.button("🔄 清空重置報告"):
             st.session_state.auto_reports = {1: None, 2: None, 3: None, 4: None, 5: None}
+            st.session_state.auto_step = 0
             st.rerun()
 
-    progress_bar = st.progress(0)
-    status_text = st.empty()
+    prompts = {
+        1: f"""
+        {base_context}
+        請撰寫第一部分：「一、 核心命理及性格特質畫象（基於生日 {b_str} 與逐位拆解之日加月制約數 {constraint_num} 之 AI 深度拆解）」。
+        內容須詳細解析其生命密碼、天賦優勢、思考邏輯，並特別納入並解構「日加月逐位相加簡化後之制約數 {constraint_num}（月份簡化 {m_red} + 日期簡化 {d_red}）」所賦予的潛在心理制約、行為盲點與突破契機。
+        格式要求：使用外框為 #131c2e、上方邊框色 #a855f7 的美觀 HTML div 區塊，內含專業中英文雙語對照。
+        """,
+        2: f"""
+        {base_context}
+        請撰寫第二部分：「二、 崗位適配性與跨部門流動評估 (Role Fit & Internal Mobility)」。
+        內容須深度評估其在現職「{job_role}」與「{target_department}」的強弱項與勝任度，同時分析其是否具備轉調至其他部門或高階職位的潛在流動選項。
+        格式要求：使用外框為 #131c2e、上方邊框色 #3b82f6 的美觀 HTML div 區塊，內含專業中英文雙語對照。
+        """,
+        3: f"""
+        {base_context}
+        請撰寫第三部分：「三、 職場人際協同與處事哲學 (Interpersonal Dynamics & Workplace Style)」。
+        內容須適用於所有職級（不論新人或高管），深入剖析其日常溝通風格、人際互動模式以及面對職場挑戰時的處事哲學。
+        格式要求：使用外框為 #131c2e、上方邊框色 #10b981 的美觀 HTML div 區塊，內含專業中英文雙語對照。
+        """,
+        4: f"""
+        {base_context}
+        請撰寫第四部分：「四、 對象 ({user_name}, {b_str}) 與主管 ({manager_name}, {mb_str}) 的動態協同法則 (Dynamic Synergy Law)」。
+        內容須詳細剖析雙方生日能量碰撞、磁場互補與黃金共振管理模式。
+        格式要求：使用外框為 #131c2e、上方邊框色 #f59e0b 的美觀 HTML div 區塊，內含專業中英文雙語對照。
+        """,
+        5: f"""
+        {base_context}
+        請撰寫第五部分：「五、 主管識人盲點破解與實景情境考題庫 (Blind Spot Analysis & Situational Interview Questions)」。
+        Content: 針對主管在面試或帶兵時容易產生的「盲點」，針對該對象 ({user_name}) 的生日與性格特質，量身設計 2-3 個具體的「實景情境考題」與解決方案評估標準。
+        格式要求：使用漸層背景 (rgba(168,85,247,0.15) 到 rgba(59,130,246,0.15)) 的精美 HTML div 區塊，內含專業中英文雙語對照。
+        """
+    }
 
+    # 按下開始按鈕時，啟動第一步
     if start_auto:
-        prompts = {
-            1: f"""
-            {base_context}
-            請撰寫第一部分：「一、 核心命理及性格特質畫象（基於生日 {b_str} 與逐位拆解之日加月制約數 {constraint_num} 之 AI 深度拆解）」。
-            內容須詳細解析其生命密碼、天賦優勢、思考邏輯，並特別納入並解構「日加月逐位相加簡化後之制約數 {constraint_num}（月份簡化 {m_red} + 日期簡化 {d_red}）」所賦予的潛在心理制約、行為盲點與突破契機。
-            格式要求：使用外框為 #131c2e、上方邊框色 #a855f7 的美觀 HTML div 區塊，內含專業中英文雙語對照。
-            """,
-            2: f"""
-            {base_context}
-            請撰寫第二部分：「二、 崗位適配性與跨部門流動評估 (Role Fit & Internal Mobility)」。
-            內容須深度評估其在現職「{job_role}」與「{target_department}」的強弱項與勝任度，同時分析其是否具備轉調至其他部門或高階職位的潛在流動選項。
-            格式要求：使用外框為 #131c2e、上方邊框色 #3b82f6 的美觀 HTML div 區塊，內含專業中英文雙語對照。
-            """,
-            3: f"""
-            {base_context}
-            請撰寫第三部分：「三、 職場人際協同與處事哲學 (Interpersonal Dynamics & Workplace Style)」。
-            內容須適用於所有職級（不論新人或高管），深入剖析其日常溝通風格、人際互動模式以及面對職場挑戰時的處事哲學。
-            格式要求：使用外框為 #131c2e、上方邊框色 #10b981 的美觀 HTML div 區塊，內含專業中英文雙語對照。
-            """,
-            4: f"""
-            {base_context}
-            請撰寫第四部分：「四、 員工 ({user_name}, {b_str}) 與主管 ({manager_name}, {mb_str}) 的動態協同法則 (Dynamic Synergy Law)」。
-            內容須詳細剖析雙方生日能量碰撞、磁場互補與黃金共振管理模式。
-            格式要求：使用外框為 #131c2e、上方邊框色 #f59e0b 的美觀 HTML div 區塊，內含專業中英文雙語對照。
-            """,
-            5: f"""
-            {base_context}
-            請撰寫第五部分：「五、 主管識人盲點破解與實景情境考題庫 (Blind Spot Analysis & Situational Interview Questions)」。
-            內容須針對主管在面試或帶兵時容易產生的「盲點」（例如只聽表面說詞、無法看清其實際解決方案能力），針對該員工 ({user_name}) 的生日與性格特質，量身設計 2-3 個具體的「實景情境考題」與解決方案評估標準，協助主管精準看出對方是否真正能幫到公司。
-            格式要求：使用漸層背景 (rgba(168,85,247,0.15) 到 rgba(59,130,246,0.15)) 的精美 HTML div 區塊，內含專業中英文雙語對照。
-            """
-        }
+        st.session_state.auto_reports = {1: None, 2: None, 3: None, 4: None, 5: None}
+        st.session_state.auto_step = 1
+        st.rerun()
 
-        for i in range(1, 6):
-            status_text.text(f"⏳ 正在自動生成第 {i}/5 部分（已採用 35 秒安全防護間隔，請耐心等候）...")
-            progress_bar.progress(i * 20)
-            st.session_state.auto_reports[i] = generate_auto_chunk(prompts[i], BUILTIN_API_KEY)
+    # 自動循環執行引擎（設定 15 秒緩衝）
+    current_step = st.session_state.auto_step
+    if 1 <= current_step <= 5:
+        if st.session_state.auto_reports[current_step] is None:
+            with st.spinner(f"⏳ 正在自動生成第 {current_step}/5 部分（已設定 15 秒安全間隔）..."):
+                res = generate_single_chunk(prompts[current_step], BUILTIN_API_KEY)
+                st.session_state.auto_reports[current_step] = res
         
-        status_text.text("✨ 全自動戰略報告已全部生成完畢！")
-        progress_bar.progress(100)
+        # 如果還沒到第五步，暫停 15 秒後自動跳轉下一步
+        if current_step < 5:
+            time.sleep(15)
+            st.session_state.auto_step += 1
+            st.rerun()
+        else:
+            st.session_state.auto_step = 0  # 歸零代表全部完成
+            st.success("🎉 全自動戰略報告已全部生成完畢！")
 
-    # ------------------ 呈現已生成的報告內容 ------------------
+    # ------------------ 即時呈現已生成的報告內容 ------------------
     st.markdown("---")
     
     titles = [
