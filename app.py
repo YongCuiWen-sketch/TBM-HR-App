@@ -70,7 +70,7 @@ st.markdown("""
 st.markdown("""
 <div style="padding: 1.5rem 0; border-bottom: 1px solid #1e293b; margin-bottom: 2rem; text-align: center;">
     <h1 style="font-size: 1.8rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #a855f7, #3b82f6, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        🔯 TBM-HR Dual-Track Intelligence Dashboard (Gemini 3.8 Flash 最新旗艦版)
+        🔯 TBM-HR Dual-Track Intelligence Dashboard (防 429 限量與語音優化版)
     </h1>
 </div>
 """, unsafe_allow_html=True)
@@ -104,7 +104,7 @@ ordered_job_roles = [
 # 初始化本地智慧資料庫
 if "live_local_db" not in st.session_state:
     st.session_state.live_local_db = pd.DataFrame([
-        {"項目分類": "部門職能", "名稱": "全系統部門模組", "詳細內容": "9大部門與有序職級聯動正常（含 Gemini 3.8 Flash 與制約數計算）。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")}
+        {"項目分類": "部門職機能", "名稱": "全系統部門模組", "詳細內容": "9大部門與有序職級聯動正常（含防 429 緩衝與語音控制）。", "最後更新": datetime.now().strftime("%Y-%m-%d %H:%M")}
     ])
 
 # 側邊欄導航與 API 設定
@@ -125,7 +125,7 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.info("🔄 **系統提示**：\n已完美串接最新 **Gemini 3.8 Flash** 模型，並內建逐位相加制約數與 5 段式雙語分段防護！")
+    st.info("🔄 **系統提示**：\n已全面加入【4秒智慧緩衝機制】以防止觸發 429 超額限制，並強化語音播放相容性！")
     
     if app_mode == "🌟 模式一：AI 驅動之雙向生日與有序職級動態報告":
         st.header("🔮 直屬主管/老闆基準設定")
@@ -150,13 +150,14 @@ def calculate_constraint_number(birth_date):
     final_constraint = reduce_to_single_digit(total)
     return m_reduced, d_reduced, final_constraint
 
-# 針對單一區塊進行帶有重試機制的 AI 生成函數 (使用最新的 gemini-3.8-flash)
+# 帶有重試機制與防 429 緩衝的 AI 生成函數
 def generate_chunk_with_retry(prompt, api_key, max_retries=3):
     genai.configure(api_key=api_key)
-    # 採用最新最強大的 gemini-3.8-flash 模型
     model = genai.GenerativeModel('gemini-3.8-flash')
     for attempt in range(max_retries):
         try:
+            # 每次請求前強制暫停 4 秒，避免每分鐘請求頻率過高觸發 429
+            time.sleep(4)
             response = model.generate_content(prompt)
             res_text = response.text.strip()
             if res_text.startswith("```html"):
@@ -166,10 +167,10 @@ def generate_chunk_with_retry(prompt, api_key, max_retries=3):
             return res_text.strip()
         except Exception as e:
             if attempt < max_retries - 1:
-                time.sleep(2)
+                time.sleep(5) # 遇到錯誤時多等 5 秒再重試
                 continue
             else:
-                return f"<div style='color: #ef4444; padding: 10px;'>此區塊生成暫時逾時或發生錯誤。({str(e)})</div>"
+                return f"<div style='color: #ef4444; padding: 10px;'>此區塊生成暫時逾時或觸發頻率限制 (429)。請稍候 30 秒後重新點擊按鈕。({str(e)})</div>"
 
 # 5段式分段組合主函數
 def generate_ai_5_parts_report(name, birth_date, dept, role, m_name, m_dept, m_lvl, m_bday, api_key, progress_bar, status_text):
@@ -184,8 +185,8 @@ def generate_ai_5_parts_report(name, birth_date, dept, role, m_name, m_dept, m_l
     要求：必須具備深度、清晰、結構嚴謹的高階顧問級分析，且每一個論述與段落都必須包含專業的中英文雙語對照。回傳乾淨的 HTML 片段。
     """
 
-    # 1. 第一段：核心命理及性格特質畫象（含逐位拆解日加月制約數）
-    status_text.text("⏳ [1/5] 正在透過 Gemini 3.8 Flash 生成：核心命理及性格特質畫象（含逐位拆解日加月制約數，中英文雙語對照）...")
+    # 1. 第一段：核心命理及性格特質畫象
+    status_text.text("⏳ [1/5] 正在生成：核心命理及性格特質畫象（含日加月制約數）...")
     progress_bar.progress(20)
     p1 = f"""
     {base_context}
@@ -196,7 +197,7 @@ def generate_ai_5_parts_report(name, birth_date, dept, role, m_name, m_dept, m_l
     html_p1 = generate_chunk_with_retry(p1, api_key)
 
     # 2. 第二段：崗位適配性與跨部門流動評估
-    status_text.text("⏳ [2/5] 正在透過 Gemini 3.8 Flash 生成：崗位適配性與跨部門流動評估（中英文雙語對照）...")
+    status_text.text("⏳ [2/5] 正在生成：崗位適配性與跨部門流動評估（智慧緩衝中）...")
     progress_bar.progress(40)
     p2 = f"""
     {base_context}
@@ -207,7 +208,7 @@ def generate_ai_5_parts_report(name, birth_date, dept, role, m_name, m_dept, m_l
     html_p2 = generate_chunk_with_retry(p2, api_key)
 
     # 3. 第三段：職場人際協同與處事哲學
-    status_text.text("⏳ [3/5] 正在透過 Gemini 3.8 Flash 生成：職場人際協同與處事哲學（中英文雙語對照）...")
+    status_text.text("⏳ [3/5] 正在生成：職場人際協同與處事哲學（智慧緩衝中）...")
     progress_bar.progress(60)
     p3 = f"""
     {base_context}
@@ -218,7 +219,7 @@ def generate_ai_5_parts_report(name, birth_date, dept, role, m_name, m_dept, m_l
     html_p3 = generate_chunk_with_retry(p3, api_key)
 
     # 4. 第四段：員工與主管的動態協同法則
-    status_text.text("⏳ [4/5] 正在透過 Gemini 3.8 Flash 生成：員工與主管的動態協同法則（中英文雙語對照）...")
+    status_text.text("⏳ [4/5] 正在生成：員工與主管的動態協同法則（智慧緩衝中）...")
     progress_bar.progress(80)
     p4 = f"""
     {base_context}
@@ -229,7 +230,7 @@ def generate_ai_5_parts_report(name, birth_date, dept, role, m_name, m_dept, m_l
     html_p4 = generate_chunk_with_retry(p4, api_key)
 
     # 5. 第五段：主管識人盲點破解與實景情境考題
-    status_text.text("⏳ [5/5] 正在透過 Gemini 3.8 Flash 生成：主管識人盲點破解與實景情境考題庫（中英文雙語對照）...")
+    status_text.text("⏳ [5/5] 正在生成：主管識人盲點破解與實景情境考題庫（最後一個區塊）...")
     progress_bar.progress(100)
     p5 = f"""
     {base_context}
@@ -239,41 +240,47 @@ def generate_ai_5_parts_report(name, birth_date, dept, role, m_name, m_dept, m_l
     """
     html_p5 = generate_chunk_with_retry(p5, api_key)
 
-    status_text.text("✨ Gemini 3.8 Flash 5段式雙語智能報告組裝完成！")
+    status_text.text("✨ 5段式雙語智能報告組裝完成！")
 
-    # 組合完整 HTML 報告
+    # 組合完整 HTML 報告（內含穩定版語音朗讀 JavaScript）
     full_html_report = f"""
     <div style="color: #e2e8f0; line-height: 1.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 15px;">
         
         <script>
-        function speakText(text) {{
+        function speakReportSummary() {{
             if ('speechSynthesis' in window) {{
                 window.speechSynthesis.cancel();
-                let utterance = new SpeechSynthesisUtterance(text);
+                let textToSpeak = "這是為 {name} 與主管 {m_name} 量身打造的五段式雙語智能戰略報告。包含核心命理制約數 {constraint_num}、崗位適配、人際協同、雙方共振及主管識人盲點考題。";
+                let utterance = new SpeechSynthesisUtterance(textToSpeak);
                 utterance.lang = 'zh-CN';
+                utterance.rate = 1.0;
                 window.speechSynthesis.speak(utterance);
+            }} else {{
+                alert('您的瀏覽器不支援語音朗讀功能。');
             }}
         }}
-        function stopReport() {{
-            if ('speechSynthesis' in window) {{ window.speechSynthesis.cancel(); }}
+        function stopReportSpeech() {{
+            if ('speechSynthesis' in window) {{ 
+                window.speechSynthesis.cancel(); 
+            }}
         }}
         </script>
 
-        <!-- 🔊 頂部總結配音控制列 -->
-        <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 15px 20px; border-radius: 10px; border: 1px solid #4338ca; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+        <!-- 🔊 頂部穩定版語音控制列 -->
+        <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 15px 20px; border-radius: 10px; border: 1px solid #4338ca; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
                 <h4 style="margin: 0; color: #818cf8; font-size: 1.0rem;">🔊 Gemini 3.8 Flash 雙語動態報告語音控制台</h4>
-                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #c7d2fe;">當前分析對象：<strong>{name} ({b_str}，制約數: {constraint_num})</strong> 搭配主管 <strong>{m_name} ({mb_str})</strong></p>
+                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #c7d2fe;">分析對象：<strong>{name} ({b_str}，制約數: {constraint_num})</strong> | 主管：<strong>{m_name}</strong></p>
             </div>
             <div>
-                <button onclick="speakText('這是為 {name} 量身打造的 Gemini 3.8 Flash 雙向生日雙語動態戰略報告與制約數分析。')" style="background: #4f46e5; color: #ffffff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin-right: 8px;">▶ 播放摘要</button>
-                <button onclick="stopReport()" style="background: #334155; color: #94a3b8; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">⏹ 停止</button>
+                <button onclick="speakReportSummary()" style="background: #4f46e5; color: #ffffff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin-right: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">▶ 播放報告語音摘要</button>
+                <button onclick="stopReportSpeech()" style="background: #334155; color: #94a3b8; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">⏹ 停止播放</button>
             </div>
         </div>
 
         <!-- 📊 雙方生日基準與對照矩陣 -->
         <div style="background: #131c2e; padding: 25px; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 30px; border-left: 4px solid #3b82f6;">
-            <h3 style="color: #3b82f6; margin: 0 0 15px 0; font-size: 1.2rem;">📊 AI 真實雙語生日基準與制約數矩陣 (Gemini 3.8 Flash Matrix)</h3>
+            <h3 style="color: #3b82f6; margin: 0 0 15px 0; font-size: 1.2rem;">📊 AI 真實雙語生日基準與制約數矩陣 (Bilingual Matrix)</h3>
             <table style="width: 100%; border-collapse: collapse; background: #0b0f19; border-radius: 8px; overflow: hidden; font-size: 0.9rem;">
                 <tr style="border-bottom: 1px solid #1e293b;">
                     <th style="padding: 12px; text-align: left; color: #e2e8f0;">對照維度 / Dimension</th>
@@ -330,7 +337,7 @@ if app_mode == "🌟 模式一：AI 驅動之雙向生日與有序職級動態�
         )
         
         st.success(f"成功透過 Gemini 3.8 Flash 為「{user_name}」與主管「{manager_name}」生成專屬 AI 動態匹配報告！")
-        components.html(report_output, height=4200, scrolling=True)
+        components.html(report_output, height=4400, scrolling=True)
 
 else:
     # 模式二：本地智慧資料庫
