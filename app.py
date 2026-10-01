@@ -66,7 +66,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 頂部乾淨的主標題區塊（已移除多餘副標題）
+# 頂部乾淨的主標題區塊
 st.markdown("""
 <div style="padding: 1.5rem 0; border-bottom: 1px solid #1e293b; margin-bottom: 2rem; text-align: center;">
     <h1 style="font-size: 1.8rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #a855f7, #3b82f6, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -131,7 +131,7 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.info("🔄 **系統提示**：\n點擊一次按鈕，系統將自動依序生成 1 至 5 部分報告。")
+    st.info("🔄 **系統提示**：\n點擊一次按鈕，系統將自動以 35 秒安全間隔依序生成 1 至 5 部分報告。")
     
     if app_mode == "🌟 模式一：全自動戰略報告生成":
         st.header("🔮 直屬主管/老闆基準設定")
@@ -156,13 +156,13 @@ def calculate_constraint_number(birth_date):
     final_constraint = reduce_to_single_digit(total)
     return m_reduced, d_reduced, final_constraint
 
-# 單一區塊呼叫 Gemini 3.8 Flash 的函數（設定為 15 秒安全緩衝）
+# 單一區塊呼叫 Gemini 3.8 Flash 的函數（設定為 35 秒安全緩衝）
 def generate_auto_chunk(prompt, api_key):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-3.8-flash')
     try:
-        # 設置 15 秒間隔確保絕對安全
-        time.sleep(15)
+        # 設置 35 秒間隔確保絕對安全與穩定
+        time.sleep(35)
         response = model.generate_content(prompt)
         res_text = response.text.strip()
         if res_text.startswith("```html"):
@@ -247,7 +247,7 @@ if app_mode == "🌟 模式一：全自動戰略報告生成":
         }
 
         for i in range(1, 6):
-            status_text.text(f"⏳ 正在自動生成第 {i}/5 部分（已採用 15 秒安全防護間隔）...")
+            status_text.text(f"⏳ 正在自動生成第 {i}/5 部分（已採用 35 秒安全防護間隔，請耐心等候）...")
             progress_bar.progress(i * 20)
             st.session_state.auto_reports[i] = generate_auto_chunk(prompts[i], BUILTIN_API_KEY)
         
